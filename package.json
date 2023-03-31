@@ -1,0 +1,31 @@
+{
+  "name": "sar_backend",
+  "version": "1.0.0",
+  "description": "SAR Project Backend ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "body-parser": "^1.20.0",
+    "chart.js": "^3.9.1",
+    "chartjs-node-canvas": "^4.1.6",
+    "cors": "^2.8.5",
+    "express": "^4.18.1",
+    "jimp": "^0.22.7",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.5.25",
+    "morgan": "^1.10.0",
+    "mssql": "^8.1.2",
+    "mssql-ssrs": "^2.0.3",
+    "nodemailer": "^6.7.8",
+    "pm2": "^5.2.2",
+    "request-promise-native": "^1.0.9"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
