@@ -199,7 +199,7 @@ exports.DataSet = async (dataReport, doc, currentY) => {
             dataReport[data.row.index].Evaluation == "NOT PASS" ||
             dataReport[data.row.index].Evaluation == "NG"
           ) {
-            doc.setTextColor(231, 76, 60); // Red
+            doc.setTextColor(0, 0, 0); // Red
           }
         }
         if (data.column.index === 4 && data.section === "body") {
@@ -383,7 +383,7 @@ exports.DataSet = async (dataReport, doc, currentY) => {
             dataReport[data.row.index].Evaluation == "NOT PASS" ||
             dataReport[data.row.index].Evaluation == "NG"
           ) {
-            doc.setTextColor(231, 76, 60); // Red
+            doc.setTextColor(0, 0, 0); // Red
           }
         }
         if (data.column.index === 4 && data.section === "body") {
@@ -564,7 +564,7 @@ exports.DataSet = async (dataReport, doc, currentY) => {
             dataReport[data.row.index].Evaluation == "NOT PASS" ||
             dataReport[data.row.index].Evaluation == "NG"
           ) {
-            doc.setTextColor(231, 76, 60); // Red
+            doc.setTextColor(0, 0, 0); // Red
           }
         }
         if (data.column.index === 4 && data.section === "body") {

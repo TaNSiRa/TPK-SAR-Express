@@ -407,6 +407,7 @@ router.post("/KACReportData_reviseKACReport", async (req, res) => {
     `;
     }
 
+
     query = queryUpdate;
     //console.log(query);
     await mssql.qurey(query);
@@ -416,10 +417,14 @@ router.post("/KACReportData_reviseKACReport", async (req, res) => {
       const sizeInBytes = stringLength * (3 / 4) - 2;
       const sizeInKb = sizeInBytes / 1000;
       console.log(sizeInKb);
+    
       if (sizeInKb < 10000) {
         break;
       }
     }
+
+    
+
     res.send(report);
   } catch (error) {
     console.log(error);

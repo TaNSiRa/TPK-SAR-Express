@@ -212,11 +212,20 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
       fontSize: 8,
     };
     var colorError = [254, 184, 171];
-    var styleDIntableError = {
+      var styleDIntableError = {
       textColor: 0,
       halign: "center",
       valign: "middle",
       fillColor: colorError,
+      font: "THSarabun",
+      fontStyle: "normal",
+      fontSize: 8,
+    };
+    var styleDIntableNoData = {
+      textColor: 0,
+      halign: "center",
+      valign: "middle",
+      fillColor: [128, 128, 128],
       font: "THSarabun",
       fontStyle: "normal",
       fontSize: 8,
@@ -230,6 +239,104 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
       fontStyle: "bold",
       fontSize: 9,
     };
+
+    // j = index month 1 set do 2 value
+    // i = index item in month
+    for (let j = 0; j < 24; j = j + 2) {
+      //add row month
+      //set 1 (row J)
+      let checkHaveData1 = true;
+      let checkHaveData2 = true;
+      if (
+        dataReport[j][0].ResultReport == "-" &&
+        dataReport[j][1].ResultReport == "-" &&
+        dataReport[j][2].ResultReport == "-" &&
+        dataReport[j][3].ResultReport == "-"
+      ) {
+        checkHaveData1 = false;
+      }
+      if (
+        dataReport[j + 1][0].ResultReport == "-" &&
+        dataReport[j + 1][1].ResultReport == "-" &&
+        dataReport[j + 1][2].ResultReport == "-" &&
+        dataReport[j + 1][3].ResultReport == "-"
+      ) {
+        checkHaveData2 = false;
+      }
+
+      dataInTable.push([
+        { rowSpan: 2, content: months[j], styles: styleRowHeadDBlue },
+      ]);
+
+      dataInTable[j].push(
+        {
+          content: checkHaveData1
+            ? dtget.toDateOnly(dataReport[j][0].SamplingDate)
+            : "",
+          styles: checkHaveData1 ? styleDIntable : styleDIntableNoData,
+        },
+        {
+          content: checkHaveData1
+            ? dtget.toDateOnly(dataReport[j][0].CreateReportDate)
+            : "",
+          styles: checkHaveData1 ? styleDIntable : styleDIntableNoData,
+        }
+      );
+      // set 2 (row J + 1)
+      dataInTable.push([
+        {
+          content: checkHaveData2
+            ? dtget.toDateOnly(dataReport[j + 1][0].SamplingDate)
+            : "",
+          styles: checkHaveData2 ? styleDIntable : styleDIntableNoData,
+        },
+        {
+          content: checkHaveData2
+            ? dtget.toDateOnly(dataReport[j + 1][0].CreateReportDate)
+            : "",
+          styles: checkHaveData2 ? styleDIntable : styleDIntableNoData,
+        },
+      ]);
+
+      //add data in row month
+      for (let i = 0; i < dataReport[j].length; i++) {
+        //set 1
+        let styleData;
+        if (checkHaveData1 == false) {
+          styleData = styleDIntableNoData;
+        } else if (
+          dataReport[j][i].Evaluation != "PASS" &&
+          dataReport[j][i].Evaluation != "-" &&
+          dataReport[j][i].Evaluation != ""
+        ) {
+          styleData = styleDIntableError;
+        } else {
+          styleData = styleDIntable;
+        }
+
+        dataInTable[j].push({
+          content: checkHaveData1 ? dataReport[j][i].ResultReport : "",
+          styles: styleData,
+        });
+        //set 2
+        let styleData2;
+        if (checkHaveData2 == false) {
+          styleData2 = styleDIntableNoData;
+        } else if (
+          dataReport[j][i].Evaluation != "PASS" &&
+          dataReport[j][i].Evaluation != "-" &&
+          dataReport[j][i].Evaluation != ""
+        ) {
+          styleData2 = styleDIntableError;
+        } else {
+          styleData2 = styleDIntable;
+        }
+        dataInTable[j + 1].push({
+          content: checkHaveData2 ? dataReport[j + 1][i].ResultReport : "",
+          styles: styleData2,
+        });
+      }
+    }
 
     // j = index month 1 set do 2 value
     // i = index item in month
@@ -403,7 +510,6 @@ exports.DataSetYearA3 = async (dataReport, doc, currentY) => {
       fontStyle: "bold",
       fontSize: fontSizeH,
       cellPadding: 0.2,
-      
     };
 
     dataInHeader.push([
@@ -483,7 +589,7 @@ exports.DataSetYearA3 = async (dataReport, doc, currentY) => {
       });
     }
 
-    //row 4 range comtrol
+    //row 4 range control
     var colorRow4 = [255, 254, 83];
     var styleRow4H = {
       textColor: 0,
@@ -581,7 +687,7 @@ exports.DataSetYearA3 = async (dataReport, doc, currentY) => {
           content: dtget.toDateOnly(dataReport[j][0].SamplingDate),
           styles: styleDIntable,
         },
-        {
+        {     
           content: dtget.toDateOnly(dataReport[j][0].CreateReportDate),
           styles: styleDIntable,
         },

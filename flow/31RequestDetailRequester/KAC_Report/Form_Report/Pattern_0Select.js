@@ -39,6 +39,8 @@ const Pattern_STIC = require("./Pattern_STIC.js");
 const Pattern_BFC = require("./Pattern_BFC.js");
 const Pattern_CITI = require("./Pattern_CITI.js");
 const Pattern_MMTH4 = require("./Pattern_MMTH4.js");
+const Pattern_SOI8 = require("./Pattern_SOI8.js");
+const Pattern_PLANT = require("./Pattern_PLANT.js");
 
 exports.SelectPattern = async (dataReport) => {
   try {
@@ -133,7 +135,15 @@ exports.SelectPattern = async (dataReport) => {
       var data = await Pattern_CITI.CreatePDF(dataReport);
     } else if (dataReport[0].PatternReport == "MMTH4") {
       var data = await Pattern_MMTH4.CreatePDF(dataReport);
-    } else {
+    } else if (dataReport[0].PatternReport == "8T1") {
+      var data = await Pattern_SOI8.CreatePDFT1(dataReport);
+    } else if (dataReport[0].PatternReport == "8T2") {
+      var data = await Pattern_SOI8.CreatePDFT2(dataReport);
+    } else if (dataReport[0].PatternReport == "8T3") {
+      var data = await Pattern_SOI8.CreatePDFT3(dataReport);
+    } else if (dataReport[0].PatternReport == "PLANT") {
+      var data = await Pattern_PLANT.CreatePDF(dataReport);
+    }else {
       {
         console.log("K1");
         var data = await Pattern_K1.CreatePDF(dataReport);

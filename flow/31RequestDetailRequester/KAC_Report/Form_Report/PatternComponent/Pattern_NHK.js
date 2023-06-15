@@ -46,18 +46,25 @@ exports.ZincNoPic = async (dataReport, doc, currentY) => {
       if (dataReport[i].ReportOrder >= 105) {
         break;
       }
-      dataBuff.push(dataReport[i]);
       //merge dupicate
       if (i < dataReport.length - 1 && dataReport[i + 1].ReportOrder < 105) {
         if (
           dataReport[i].ProcessReportName == dataReport[i + 1].ProcessReportName
         ) {
           let countSpan = 2;
-          for (let j = 1; i + j < dataReport.length; j++) {
-            if (i + j < dataReport.length - 1) {
+          for (
+            let j = 1;
+            i + j < dataReport.length && dataReport[i + j].ReportOrder < 105;
+            j++
+          ) {
+            if (
+              i + j < dataReport.length - 1 &&
+              dataReport[i + j].ReportOrder < 105
+            ) {
               if (
                 dataReport[i].ProcessReportName ==
-                dataReport[i + j + 1].ProcessReportName
+                  dataReport[i + j + 1].ProcessReportName &&
+                dataReport[i + j + 1].ReportOrder < 105
               ) {
                 countSpan++;
               } else {
@@ -68,7 +75,9 @@ exports.ZincNoPic = async (dataReport, doc, currentY) => {
             }
           }
           for (let j = 0; j < countSpan; j++) {
+            //console.log(dataReport[i + j].ReportOrder);
             if (j == 0) {
+              dataBuff.push(dataReport[i]);
               dataInTable.push([
                 {
                   rowSpan: countSpan,
@@ -81,6 +90,7 @@ exports.ZincNoPic = async (dataReport, doc, currentY) => {
                 dataReport[i].Evaluation,
               ]);
             } else {
+              dataBuff.push(dataReport[i + j]);
               dataInTable.push([
                 //dataReport[i + j].ProcessReportName,
                 dataReport[i + j].ItemReportName,
@@ -92,6 +102,7 @@ exports.ZincNoPic = async (dataReport, doc, currentY) => {
           }
           i = i + countSpan - 1;
         } else {
+          dataBuff.push(dataReport[i]);
           dataInTable.push([
             dataReport[i].ProcessReportName,
             dataReport[i].ItemReportName,
@@ -101,6 +112,7 @@ exports.ZincNoPic = async (dataReport, doc, currentY) => {
           ]);
         }
       } else {
+        dataBuff.push(dataReport[i + j]);
         dataInTable.push([
           dataReport[i].ProcessReportName,
           dataReport[i].ItemReportName,
@@ -110,7 +122,6 @@ exports.ZincNoPic = async (dataReport, doc, currentY) => {
         ]);
       }
     }
-
     doc.autoTable({
       startY: doc.lastAutoTable.finalY + 4,
       head: [
@@ -177,6 +188,7 @@ exports.ZincNoPic = async (dataReport, doc, currentY) => {
 
       theme: "grid",
     });
+    console.log("EndZincNoPic");
     currentY = doc.lastAutoTable.finalY;
     return [doc, currentY];
   } catch (err) {
