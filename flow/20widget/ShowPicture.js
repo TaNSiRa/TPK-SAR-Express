@@ -7,13 +7,14 @@ router.post('/Widget_getPicture', async (req, res) => {
     try {
         let picname = req.body.path;
         console.log(picname);
-        let pic64 
-        if(`${picname}` ==='N/A'){
-//
-            pic64 = pic.getpic(`C:\\SAR\\asset\\TPK_LOGO.jpg`);
-        }else{
-            pic64 = pic.getpic(`C:\\AutomationProject\\SAR\\asset\\${picname}`);
-        }
+        // let pic64 
+//         if(`${picname}` ==='N/A'){
+// //
+//             pic64 = pic.getpic(`C:\\SAR\\asset\\TPK_LOGO.jpg`);
+//         }else{
+//             pic64 = pic.getpic(`C:\\AutomationProject\\SAR\\asset\\${picname}`);
+//         }
+        let pic64 = pic.getpic(`C:\\AutomationProject\\SAR\\asset\\${picname}`);
         
         res.send(pic64);
     } catch (error) {
