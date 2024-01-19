@@ -212,7 +212,7 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
       fontSize: 8,
     };
     var colorError = [254, 184, 171];
-      var styleDIntableError = {
+    var styleDIntableError = {
       textColor: 0,
       halign: "center",
       valign: "middle",
@@ -323,9 +323,9 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
         if (checkHaveData2 == false) {
           styleData2 = styleDIntableNoData;
         } else if (
-          dataReport[j][i].Evaluation != "PASS" &&
-          dataReport[j][i].Evaluation != "-" &&
-          dataReport[j][i].Evaluation != ""
+          dataReport[j+1][i].Evaluation != "PASS" &&
+          dataReport[j+1][i].Evaluation != "-" &&
+          dataReport[j+1][i].Evaluation != ""
         ) {
           styleData2 = styleDIntableError;
         } else {
@@ -338,7 +338,7 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
       }
     }
 
-    // j = index month 1 set do 2 value
+    /* // j = index month 1 set do 2 value
     // i = index item in month
     for (let j = 0; j < 24; j = j + 2) {
       //add row month
@@ -395,7 +395,7 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
           styles: checkErrorOk2 ? styleDIntable : styleDIntableError,
         });
       }
-    }
+    } */
 
     doc.autoTable({
       startY: currentY,
@@ -687,7 +687,7 @@ exports.DataSetYearA3 = async (dataReport, doc, currentY) => {
           content: dtget.toDateOnly(dataReport[j][0].SamplingDate),
           styles: styleDIntable,
         },
-        {     
+        {
           content: dtget.toDateOnly(dataReport[j][0].CreateReportDate),
           styles: styleDIntable,
         },

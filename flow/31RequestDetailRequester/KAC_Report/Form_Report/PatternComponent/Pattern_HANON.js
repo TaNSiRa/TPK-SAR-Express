@@ -70,7 +70,7 @@ exports.CoatingPre = async (dataReport, doc, currentY) => {
             rowSpan: 4,
             content: "Model",
           },
-          { colSpan: 6, content: "Coating on evaporator (g/m²)" },
+          { colSpan: 6, content: "Coating on evaporator (mg/m²)" },
         ],
         [
           { colSpan: 3, content: "Front" },

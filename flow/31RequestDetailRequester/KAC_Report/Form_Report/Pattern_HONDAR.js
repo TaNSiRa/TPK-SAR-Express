@@ -93,11 +93,14 @@ exports.CreatePDF = async (dataReport) => {
         ResultReport: dataBuffSet[j][0].ResultReport,
         Evaluation: dataBuffSet[j][0].Evaluation,
       });
+      dataBuffSet[j][3].ControlRange = "<6.0";
       dataBuffSet[j][5].ProcessReportName = "Degreasing (FC-E2032T)";
       dataBuffSet[j][6].ProcessReportName = "Degreasing (FC-E2032T)";
       dataBuffSet[j][7].ProcessReportName = "Degreasing (FC-E2032T)";
       dataBuffSet[j][8].ProcessReportName = "Degreasing (FC-E2032T)";
       dataBuffSet[j][9].ProcessReportName = "Degreasing (FC-E2032T)";
+      dataBuffSet[j][8].ControlRange = "<5.0";
+      
     }
 
     //add missing data z c f-f
