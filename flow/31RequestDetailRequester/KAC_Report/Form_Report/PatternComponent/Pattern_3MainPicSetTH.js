@@ -5,7 +5,7 @@ const dtConv = require("../../../../../function/dateTime");
 
 exports.PicSetTH = async (dataReport, doc, currentY) => {
   try {
-    console.log("PicSet");
+    console.log("PicSet6");
     var foundData = 0;
     for (let i = 0; i < dataReport.length; i++) {
       if (dataReport[i].ReportOrder > 100) {
