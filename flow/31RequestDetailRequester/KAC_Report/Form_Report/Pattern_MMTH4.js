@@ -664,6 +664,7 @@ async function PicSet(dataReport, doc, currentY) {
       }
     }
     var buffpicResize = [];
+    console.log("------->>>>><<")
     for (let i = 0; i < 8; i++) {
       let bitmap = fs.readFileSync(
         "C:\\AutomationProject\\SAR\\asset\\" +
