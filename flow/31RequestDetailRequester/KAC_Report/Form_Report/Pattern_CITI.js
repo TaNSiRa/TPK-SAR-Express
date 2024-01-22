@@ -295,7 +295,7 @@ async function PicSetCITI(dataReport, doc, currentY) {
               /* console.log(data.row.index);
               console.log(countSpan);
               console.log(dataReport[i].ResultReport); */
-
+              console.log("------->>>>>")
               try {
                 let bitmap = fs.readFileSync(
                   "C:\\AutomationProject\\SAR\\asset\\" +
