@@ -652,7 +652,7 @@ async function PicSet(dataReport, doc, currentY) {
       theme: "plain",
     });
     currentY = doc.lastAutoTable.finalY;
-    console.log("PicSet");
+    console.log("PicSet3");
 
     var picHeight = 40;
     var picWidht = 53.2;
@@ -666,10 +666,14 @@ async function PicSet(dataReport, doc, currentY) {
     var buffpicResize = [];
     console.log("------->>>>><<")
     for (let i = 0; i < 8; i++) {
-      let bitmap = fs.readFileSync(
-        "C:\\AutomationProject\\SAR\\asset\\" +
-          dataReport[startIndex + i].ResultReport
-      );
+      let bitmap = [0];
+      if(dataReport[startIndex + i].ResultReport !='N/A'){
+      bitmap = fs.readFileSync(
+          "C:\\AutomationProject\\SAR\\asset\\" +
+            dataReport[startIndex + i].ResultReport
+        );
+      }
+     
       var picResize = await ResizeBase64(bitmap);
       buffpicResize.push(picResize);
     }
