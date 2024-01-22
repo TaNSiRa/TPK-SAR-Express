@@ -667,6 +667,7 @@ async function PicSetAPM(dataReport, CurrentRound, doc, currentY) {
             data.row.index == 6 ||
             data.row.index == 9)
         ) {
+          console.log("-------")
           try {
             let bitmap = fs.readFileSync(
               "C:\\AutomationProject\\SAR\\asset\\" + picSetData[runningPic]
