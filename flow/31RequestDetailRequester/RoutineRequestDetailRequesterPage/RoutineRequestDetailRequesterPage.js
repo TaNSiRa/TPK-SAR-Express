@@ -84,7 +84,7 @@ router.post(
       }
       query = query + `where reqNo = '${dataIn[0].ReqNo}';`;
 
-      //console.log(query);
+      console.log(query);
       await mssql.qurey(query);
       //var report = await CreateReport(dataIn[0].ReqNo);
 
