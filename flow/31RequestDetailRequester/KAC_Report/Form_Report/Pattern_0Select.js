@@ -41,6 +41,7 @@ const Pattern_CITI = require("./Pattern_CITI.js");
 const Pattern_MMTH4 = require("./Pattern_MMTH4.js");
 const Pattern_SOI8 = require("./Pattern_SOI8.js");
 const Pattern_PLANT = require("./Pattern_PLANT.js");
+const Pattern_BESTEX = require("./Pattern_BESTEX.js");
 
 exports.SelectPattern = async (dataReport) => {
   try {
@@ -143,7 +144,9 @@ exports.SelectPattern = async (dataReport) => {
       var data = await Pattern_SOI8.CreatePDFT3(dataReport);
     } else if (dataReport[0].PatternReport == "PLANT") {
       var data = await Pattern_PLANT.CreatePDF(dataReport);
-    }else {
+    } else if (dataReport[0].PatternReport == "BESTEX") {
+      var data = await Pattern_BESTEX.CreatePDF(dataReport);
+    } else {
       {
         console.log("K1");
         var data = await Pattern_K1.CreatePDF(dataReport);
