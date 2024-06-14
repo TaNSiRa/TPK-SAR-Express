@@ -9,12 +9,12 @@ exports.loginServer = async () => {
   try {
     console.log("login2");
     // must set server url
-    //var serverUrl = '127.0.0.1:ReportServer';
-    var url = "127.0.0.1/ReportServer";
+    //var serverUrl = '172.23.10.51:ReportServer';
+    var url = "172.23.10.51/ReportServer";
     //var path = `C:\\Program Files\\Microsoft SQL Server Reporting Services\\SSRS\\ReportServer`;
 
     var serverConfig = {
-      server: "127.0.0.1",
+      server: "172.23.10.51",
       instance: "SAR",
       isHttps: false, // optional, default: false
       port: 80, // optional, default: 80
@@ -66,9 +66,9 @@ const list = await ssrs.reportService.listChildren(reportPath);
 const report = await ssrs.reportExecution.getReport(reportPath, fileType, parameters);
 
 //var url = 'http(s)://<serverName>:<port>/ReportServer_<sqlInstance>',
-var url = 'http://127.0.0.1/ReportServer',
+var url = 'http://172.23.10.51/ReportServer',
 var serverConfig = {
-    server: '127.0.0.1',
+    server: '172.23.10.51',
     instance: 'SAR',
     isHttps: false, // optional, default: false
     port: 80, // optional, default: 80
