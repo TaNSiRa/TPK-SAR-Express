@@ -22,7 +22,7 @@ exports.MasterWeeklyDocument = async (doc) => {
       var pageWidth = doc.internal.pageSize.width;
       doc.setFont("THSarabun", "normal");
       doc.setFontSize(12);
-      doc.text("FR-CTS-02/004-02-09/01/14", pageWidth - 50, 10);
+      doc.text("FR-CTS-02/004-03-24/06/24", pageWidth - 50, 10);
     }
     return doc;
   } catch (err) {

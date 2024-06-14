@@ -444,7 +444,7 @@ exports.HeaderSetYearA3 = async (dataReport, doc) => {
         ],
         [
           {
-            content: "FR-CTS02/004-02-09/01/14",
+            content: "FR-CTS-02/004-02-09/01/14",
             styles: {
               textColor: 0,
               halign: "right",
