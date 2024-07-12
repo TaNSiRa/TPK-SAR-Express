@@ -2,6 +2,71 @@ const { jsPDF } = require("jspdf"); // will automatically load the node version
 const { autoTable } = require("jspdf-autotable");
 const fs = require("fs");
 const dtConv = require("../../../../../function/dateTime");
+const sql = require('mssql');
+
+// Configuration for SQL Server
+const config = {
+  user: 'sa',
+  password: '12345678',
+  database: 'SAR',
+  server: '127.0.0.1',
+  options: {
+    encrypt: false, // Use this if you're connecting to a local SQL Server
+    enableArithAbort: true
+  }
+};
+
+let reqNo = null;
+
+exports.setReqNo = (newReqNo) => {
+  reqNo = newReqNo;
+  console.log("ReqNo has been set to:", reqNo);
+};
+
+exports.MasterYearlyDocument = async () => {
+  try {
+    if (!reqNo) {
+      console.log(reqNo);
+      console.log("Error: reqNo is null or undefined.");
+      return null;
+    }
+
+    console.log("MasterYearlyDocument");
+    console.log("reqNo: " + reqNo);
+
+    let pool = await sql.connect(config);
+
+    let result = await pool.request()
+      .input('reqNo', sql.VarChar, reqNo)
+      .query(`SELECT CreateReportDate FROM Routine_KACReport WHERE ReqNo = @reqNo`);
+
+    let createReportDate;
+
+    if (result.recordset.length > 0) {
+      createReportDate = result.recordset[0].CreateReportDate;
+    } else {
+      console.log("No records found for ReqNo:", reqNo);
+      createReportDate = new Date('2024-06-24'); // ใช้ค่า FR-CTS-02/004-03-24/06/24 ถ้าไม่พบ ReqNo
+    }
+
+    let docNumber;
+    // เปรียบเทียบ CreateReportDate กับวันที่ 24 Jun 2024
+    if (new Date(createReportDate) < new Date('2024-06-24')) {
+      console.log(createReportDate);
+      docNumber = "FR-CTS-02/008-00-10/02/22"; // ถ้าเก่ากว่า 24 Jun 2024
+    } else {
+      console.log(createReportDate);
+      docNumber = "FR-CTS-02/009-00-24/06/24"; // ถ้าใหม่กว่าหรือเท่ากับ 24 Jun 2024
+    }
+
+    await sql.close();
+    return docNumber;
+  } catch (err) {
+    console.log(err);
+    await sql.close();
+    return err;
+  }
+};
 
 exports.HeaderSetYear = async (dataReport, doc) => {
   try {
@@ -74,6 +139,8 @@ exports.HeaderSetYear = async (dataReport, doc) => {
     );
     //currentY = currentY + picHigh;
 
+    let docNumber = await exports.MasterYearlyDocument();
+
     doc.autoTable({
       startY: currentY,
       head: [
@@ -109,7 +176,7 @@ exports.HeaderSetYear = async (dataReport, doc) => {
         ],
         [
           {
-            content: "FR-CTS-02/008-00-10/02/22",
+            content: docNumber,
             styles: {
               textColor: 0,
               halign: "right",
@@ -304,8 +371,8 @@ exports.SignSetYear = async (dataReport, doc, currentY) => {
             try {
               let bitmap = fs.readFileSync(
                 "C:\\AutomationProject\\SAR\\asset_ts\\Sign_Pic\\" +
-                  dataInTable[3][data.column.index] +
-                  ".jpg"
+                dataInTable[3][data.column.index] +
+                ".jpg"
               );
               doc.addImage(
                 bitmap.toString("base64"),
@@ -409,6 +476,8 @@ exports.HeaderSetYearA3 = async (dataReport, doc) => {
     );
     //currentY = currentY + picHigh;
 
+    let docNumber = await exports.MasterYearlyDocument();
+    
     doc.autoTable({
       startY: currentY,
       head: [
@@ -444,7 +513,7 @@ exports.HeaderSetYearA3 = async (dataReport, doc) => {
         ],
         [
           {
-            content: "FR-CTS02/004-02-09/01/14",
+            content: docNumber,
             styles: {
               textColor: 0,
               halign: "right",
@@ -639,8 +708,8 @@ exports.SignSetYearA3 = async (dataReport, doc, currentY) => {
             try {
               let bitmap = fs.readFileSync(
                 "C:\\AutomationProject\\SAR\\asset_ts\\Sign_Pic\\" +
-                  dataInTable[3][data.column.index] +
-                  ".jpg"
+                dataInTable[3][data.column.index] +
+                ".jpg"
               );
               doc.addImage(
                 bitmap.toString("base64"),

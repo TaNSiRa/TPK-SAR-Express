@@ -80,7 +80,7 @@ exports.CreatePDF = async (dataReport) => {
     currentY = buffDoc[1];
 
     //Document Code
-    doc = await Pattern_Doc.MasterWeeklyDocument(doc);
+    doc = await Pattern_Doc.MasterWeeklyDocument1(doc);
 
     await doc.save(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +

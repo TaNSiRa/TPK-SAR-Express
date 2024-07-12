@@ -1,8 +1,15 @@
 const createpdf = require("../KAC_Report/Form_Report/Pattern_0Select.js");
 const mssql = require("../../../function/mssql.js");
-
+const masterDoc = require("C:/Users/auto/Desktop/Express/flow/31RequestDetailRequester/KAC_Report/Form_Report/PatternComponent/Pattern_5MasterDoc.js");
+const masterDocYearly = require("C:/Users/auto/Desktop/Express/flow/31RequestDetailRequester/KAC_Report/Form_Report/PatternComponent/Pattern_1MainHeadSetYear.js");
 exports.CreateReport = async (reqNo) => {
   console.log("in CreateReport");
+  console.log("CreateReportreqNo: " + reqNo); // Debugging
+
+  // ส่ง reqNo ไปยังไฟล์ Pattern_5MasterDoc.js
+  masterDoc.setReqNo(reqNo);
+  masterDocYearly.setReqNo(reqNo);
+
   try {
     var buffDataIn = await mssql.qurey(
       `select * from Routine_KACReport where reqno = '${reqNo}' and reportorder != 0 order by reportorder asc`
@@ -12,6 +19,7 @@ exports.CreateReport = async (reqNo) => {
     dataReport = buffDataIn.recordset;
     dataReport = await this.ReplaceItemName(dataReport);
     var pdf = await createpdf.SelectPattern(dataReport);
+
     return pdf;
   } catch (error) {
     console.log(error);

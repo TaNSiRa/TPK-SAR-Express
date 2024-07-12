@@ -13,10 +13,10 @@ router.post("/testpdf", async (req, res) => {
   try {
     //ssrs.loginServer();
     /* ssrs.downloadPDF(
-      "http://172.23.10.51/ReportServer?%2fReport+Project1%2fSAR_KAC&rs:Format=PDF&rs:ClearSession=true&rs:Command=Render&ReqNo=RTB-MKT-22-002",
+      "http://127.0.0.1/ReportServer?%2fReport+Project1%2fSAR_KAC&rs:Format=PDF&rs:ClearSession=true&rs:Command=Render&ReqNo=RTB-MKT-22-002",
       "c:/temp/somePDF.pdf"
     ); */
-    //console.log(axios.get("http://172.23.10.51/ReportServer?%2fReport+Project1%2fSAR_KAC&rs:Format=PDF&rs:ClearSession=true&rs:Command=Render&ReqNo=RTB-MKT-22-002"));
+    //console.log(axios.get("http://127.0.0.1/ReportServer?%2fReport+Project1%2fSAR_KAC&rs:Format=PDF&rs:ClearSession=true&rs:Command=Render&ReqNo=RTB-MKT-22-002"));
 
     //let pic64 = pic.getpic(`C:\\AutomationProject\\SAR\\asset\\${picname}`);
     //ssrs2.request();

@@ -86,6 +86,9 @@ exports.CreatePDF = async (dataReport) => {
     );
     doc = buffDoc[0];
 
+    //Document Code
+    doc = await Pattern_Doc.MasterWeeklyDocument1(doc);
+
     //currentY = buffDoc[1];
     /* 
 

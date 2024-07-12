@@ -35,7 +35,7 @@ exports.CreatePDF = async (dataReport) => {
       if (
         i != 0 &&
         dtget.toDateOnly(dataBuff[i].SamplingDate) !=
-          dtget.toDateOnly(dataBuff[i - 1].SamplingDate)
+        dtget.toDateOnly(dataBuff[i - 1].SamplingDate)
       ) {
         j++;
         dataBuffSet.push([]);
@@ -103,8 +103,8 @@ exports.CreatePDF = async (dataReport) => {
 
     await doc.save(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
 
     console.log("end SavePDF");
@@ -112,8 +112,8 @@ exports.CreatePDF = async (dataReport) => {
     //console.log(doc.output('datauristring'));
     var bitmap = fs.readFileSync(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
     // convert binary data to base64 encoded string
     //console.log(doc.output());
@@ -323,10 +323,10 @@ async function DataSet(dataReport, CurrentRound, doc, currentY) {
                 //dataReport[i].ProcessReportName,
                 dataReport[0][i].ItemReportName,
                 dataReport[0][i].ControlRange,
-                dataReport[0][i].ResultReport,
-                dataReport[1][i].ResultReport,
-                dataReport[2][i].ResultReport,
-                dataReport[3][i].ResultReport,
+                dataReport[0][i].ResultReport && !isNaN(parseFloat(dataReport[0][i].ResultReport)) ? parseFloat(dataReport[0][i].ResultReport).toFixed(1) : dataReport[0][i].ResultReport,
+                dataReport[1][i].ResultReport && !isNaN(parseFloat(dataReport[1][i].ResultReport)) ? parseFloat(dataReport[1][i].ResultReport).toFixed(1) : dataReport[1][i].ResultReport,
+                dataReport[2][i].ResultReport && !isNaN(parseFloat(dataReport[2][i].ResultReport)) ? parseFloat(dataReport[2][i].ResultReport).toFixed(1) : dataReport[2][i].ResultReport,
+                dataReport[3][i].ResultReport && !isNaN(parseFloat(dataReport[3][i].ResultReport)) ? parseFloat(dataReport[3][i].ResultReport).toFixed(1) : dataReport[3][i].ResultReport,
                 dataReport[CurrentRound - 1][i].Evaluation,
               ]);
             } else {
@@ -334,10 +334,10 @@ async function DataSet(dataReport, CurrentRound, doc, currentY) {
                 //dataReport[i + j].ProcessReportName,
                 dataReport[0][i + j].ItemReportName,
                 dataReport[0][i + j].ControlRange,
-                dataReport[0][i + j].ResultReport,
-                dataReport[1][i + j].ResultReport,
-                dataReport[2][i + j].ResultReport,
-                dataReport[3][i + j].ResultReport,
+                dataReport[0][i + j].ResultReport && !isNaN(parseFloat(dataReport[0][i + j].ResultReport)) ? parseFloat(dataReport[0][i + j].ResultReport).toFixed(1) : dataReport[0][i + j].ResultReport,
+                dataReport[1][i + j].ResultReport && !isNaN(parseFloat(dataReport[1][i + j].ResultReport)) ? parseFloat(dataReport[1][i + j].ResultReport).toFixed(1) : dataReport[1][i + j].ResultReport,
+                dataReport[2][i + j].ResultReport && !isNaN(parseFloat(dataReport[2][i + j].ResultReport)) ? parseFloat(dataReport[2][i + j].ResultReport).toFixed(1) : dataReport[2][i + j].ResultReport,
+                dataReport[3][i + j].ResultReport && !isNaN(parseFloat(dataReport[3][i + j].ResultReport)) ? parseFloat(dataReport[3][i + j].ResultReport).toFixed(1) : dataReport[3][i + j].ResultReport,
                 dataReport[CurrentRound - 1][i + j].Evaluation,
               ]);
             }
@@ -348,10 +348,10 @@ async function DataSet(dataReport, CurrentRound, doc, currentY) {
             dataReport[0][i].ProcessReportName,
             dataReport[0][i].ItemReportName,
             dataReport[0][i].ControlRange,
-            dataReport[0][i].ResultReport,
-            dataReport[1][i].ResultReport,
-            dataReport[2][i].ResultReport,
-            dataReport[3][i].ResultReport,
+            dataReport[0][i].ResultReport && !isNaN(parseFloat(dataReport[0][i].ResultReport)) ? parseFloat(dataReport[0][i].ResultReport).toFixed(1) : dataReport[0][i].ResultReport,
+            dataReport[1][i].ResultReport && !isNaN(parseFloat(dataReport[1][i].ResultReport)) ? parseFloat(dataReport[1][i].ResultReport).toFixed(1) : dataReport[1][i].ResultReport,
+            dataReport[2][i].ResultReport && !isNaN(parseFloat(dataReport[2][i].ResultReport)) ? parseFloat(dataReport[2][i].ResultReport).toFixed(1) : dataReport[2][i].ResultReport,
+            dataReport[3][i].ResultReport && !isNaN(parseFloat(dataReport[3][i].ResultReport)) ? parseFloat(dataReport[3][i].ResultReport).toFixed(1) : dataReport[3][i].ResultReport,
             dataReport[CurrentRound - 1][i].Evaluation,
           ]);
         }
@@ -360,10 +360,10 @@ async function DataSet(dataReport, CurrentRound, doc, currentY) {
           dataReport[0][i].ProcessReportName,
           dataReport[0][i].ItemReportName,
           dataReport[0][i].ControlRange,
-          dataReport[0][i].ResultReport,
-          dataReport[1][i].ResultReport,
-          dataReport[2][i].ResultReport,
-          dataReport[3][i].ResultReport,
+          dataReport[0][i].ResultReport && !isNaN(parseFloat(dataReport[0][i].ResultReport)) ? parseFloat(dataReport[0][i].ResultReport).toFixed(1) : dataReport[0][i].ResultReport,
+          dataReport[1][i].ResultReport && !isNaN(parseFloat(dataReport[1][i].ResultReport)) ? parseFloat(dataReport[1][i].ResultReport).toFixed(1) : dataReport[1][i].ResultReport,
+          dataReport[2][i].ResultReport && !isNaN(parseFloat(dataReport[2][i].ResultReport)) ? parseFloat(dataReport[2][i].ResultReport).toFixed(1) : dataReport[2][i].ResultReport,
+          dataReport[3][i].ResultReport && !isNaN(parseFloat(dataReport[3][i].ResultReport)) ? parseFloat(dataReport[3][i].ResultReport).toFixed(1) : dataReport[3][i].ResultReport,
           dataReport[CurrentRound - 1][i].Evaluation,
         ]);
       }
@@ -419,11 +419,11 @@ async function DataSet(dataReport, CurrentRound, doc, currentY) {
         ) {
           if (
             dataReport[data.column.index - 3][data.row.index].Evaluation ==
-              "LOW" ||
+            "LOW" ||
             dataReport[data.column.index - 3][data.row.index].Evaluation ==
-              "HIGH" ||
+            "HIGH" ||
             dataReport[data.column.index - 3][data.row.index].Evaluation ==
-              "NOT PASS" ||
+            "NOT PASS" ||
             dataReport[data.column.index - 3][data.row.index].Evaluation == "NG"
           ) {
             doc.setTextColor(231, 76, 60); // Red
@@ -456,7 +456,7 @@ async function PicSetAPM(dataReport, CurrentRound, doc, currentY) {
   try {
     console.log("PicSetAPM");
     doc.addPage("a4", "landscape");
-    currentY = 10;
+    currentY = 15;
     doc.autoTable({
       startY: currentY + 4,
       head: [

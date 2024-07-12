@@ -34,7 +34,7 @@ exports.CreatePDF = async (dataReport) => {
       if (
         i != 0 &&
         dtget.toDateOnly(dataBuff[i].SamplingDate) !=
-          dtget.toDateOnly(dataBuff[i - 1].SamplingDate)
+        dtget.toDateOnly(dataBuff[i - 1].SamplingDate)
       ) {
         j++;
         dataBuffSet.push([]);
@@ -68,10 +68,22 @@ exports.CreatePDF = async (dataReport) => {
     doc = buffDoc[0];
     currentY = buffDoc[1];
 
+    //sign set
+    buffDoc = await Pattern_MainH.SignSet(dataReport, doc, currentY);
+    doc = buffDoc[0];
+    currentY = buffDoc[1];
+
     //Data Set
     buffDoc = await DataSet(dataBuffSet, doc, currentY);
     doc = buffDoc[0];
     currentY = buffDoc[1];
+
+    currentY = await Pattern_Doc.addPage(doc);
+    //Pic Set
+    buffDoc = await PicFilter(dataBuffSet[currentRound - 1], doc, currentY);
+    doc = buffDoc[0];
+    currentY = buffDoc[1];
+    currentY = currentY + 4;
 
     //comment Set
     buffDoc = await Pattern_MainC.CommentSet(
@@ -82,24 +94,13 @@ exports.CreatePDF = async (dataReport) => {
     doc = buffDoc[0];
     currentY = buffDoc[1];
 
-    currentY = await Pattern_Doc.addPage(doc);
-    //Pic Set
-    buffDoc = await PicFilter(dataBuffSet[currentRound - 1], doc, currentY);
-    doc = buffDoc[0];
-    currentY = buffDoc[1];
-    currentY = currentY + 4;
-    //sign set
-    buffDoc = await Pattern_MainH.SignSet(dataReport, doc, currentY);
-    doc = buffDoc[0];
-    currentY = buffDoc[1];
-
     //Document Code
     doc = await Pattern_Doc.MasterWeeklyDocument(doc);
 
     await doc.save(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
 
     console.log("end SavePDF");
@@ -107,8 +108,8 @@ exports.CreatePDF = async (dataReport) => {
     //console.log(doc.output('datauristring'));
     var bitmap = fs.readFileSync(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
     // convert binary data to base64 encoded string
     //console.log(doc.output());
@@ -425,7 +426,7 @@ function PicFilter(dataReport, doc, currentY) {
           try {
             let bitmap = fs.readFileSync(
               "C:\\AutomationProject\\SAR\\asset\\" +
-                dataReport[dataReport.length - 1].ResultReport
+              dataReport[dataReport.length - 1].ResultReport
             );
             runningPic++;
             doc.addImage(

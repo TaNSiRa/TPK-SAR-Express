@@ -35,7 +35,7 @@ exports.CreatePDF = async (dataReport) => {
       if (
         i != 0 &&
         dtget.toDateOnly(dataBuff[i].SamplingDate) !=
-          dtget.toDateOnly(dataBuff[i - 1].SamplingDate)
+        dtget.toDateOnly(dataBuff[i - 1].SamplingDate)
       ) {
         j++;
         dataBuffSet.push([]);
@@ -151,6 +151,18 @@ exports.CreatePDF = async (dataReport) => {
     doc = buffDoc[0];
     currentY = buffDoc[1];
 
+    //SignSet
+    buffDoc = await SignSetHONDAP(dataBuffSet[currentRound - 1], doc, currentY);
+    doc = buffDoc[0];
+    currentY = buffDoc[1] + 5;
+
+    buffDoc = await Pattern_MainH.SignSet(dataReport, doc, currentY);
+    doc = buffDoc[0];
+    currentY = buffDoc[1];
+
+    doc.addPage("a4", "portrait");
+    currentY = 25;
+
     //Data Set
     console.log("1");
     buffDoc = await DataSet(dataBuffSet, currentRound, doc, currentY);
@@ -174,23 +186,13 @@ exports.CreatePDF = async (dataReport) => {
     doc = buffDoc[0];
     currentY = buffDoc[1];
 
-    //SignSet
-    currentY = 200;
-    buffDoc = await SignSetHONDAP(dataBuffSet[currentRound - 1], doc, currentY);
-    doc = buffDoc[0];
-    currentY = buffDoc[1] + 5;
-
-    buffDoc = await Pattern_MainH.SignSet(dataReport, doc, currentY);
-    doc = buffDoc[0];
-    currentY = buffDoc[1];
-
     //Document Code
     doc = await Pattern_Doc.MasterWeeklyDocument(doc);
 
     await doc.save(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
 
     console.log("end SavePDF");
@@ -198,8 +200,8 @@ exports.CreatePDF = async (dataReport) => {
     //console.log(doc.output('datauristring'));
     var bitmap = fs.readFileSync(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
     // convert binary data to base64 encoded string
     //console.log(doc.output());
@@ -527,11 +529,11 @@ async function DataSet(dataReport, CurrentRound, doc, currentY) {
         ) {
           if (
             dataReport[data.column.index - 3][data.row.index].Evaluation ==
-              "LOW" ||
+            "LOW" ||
             dataReport[data.column.index - 3][data.row.index].Evaluation ==
-              "HIGH" ||
+            "HIGH" ||
             dataReport[data.column.index - 3][data.row.index].Evaluation ==
-              "NOT PASS" ||
+            "NOT PASS" ||
             dataReport[data.column.index - 3][data.row.index].Evaluation == "NG"
           ) {
             doc.setTextColor(231, 76, 60); // Red

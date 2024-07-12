@@ -9,6 +9,7 @@ const dtConv = require("../../../../function/dateTime.js");
 const fs = require("fs");
 const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
 const Jimp = require("jimp");
+const Pattern_Doc = require("./PatternComponent/Pattern_5MasterDoc.js");
 /* const { isGeneratorFunction } = require("util/types");
 const { start } = require("repl");
 const { count } = require("console");
@@ -36,7 +37,7 @@ exports.CreatePDF = async (dataReport) => {
       if (
         i != 0 &&
         dtConv.toDateOnly(dataBuff[i].SamplingDate) !=
-          dtConv.toDateOnly(dataBuff[i - 1].SamplingDate)
+        dtConv.toDateOnly(dataBuff[i - 1].SamplingDate)
       ) {
         j++;
         dataBuffSet.push([]);
@@ -90,6 +91,9 @@ exports.CreatePDF = async (dataReport) => {
     );
     doc = buffDoc[0];
 
+    //Document Code
+    doc = await Pattern_Doc.MasterWeeklyDocument1(doc);
+
     doc.addPage("l", "mm", "a3", true);
     currentY = 10;
 
@@ -118,8 +122,8 @@ exports.CreatePDF = async (dataReport) => {
 
     await doc.save(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
 
     //console.log("end SavePDF");
@@ -127,8 +131,8 @@ exports.CreatePDF = async (dataReport) => {
     //console.log(doc.output('datauristring'));
     var bitmap = fs.readFileSync(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
     // convert binary data to base64 encoded string
     //console.log(doc.output());
@@ -667,13 +671,13 @@ async function PicSet(dataReport, doc, currentY) {
     console.log("------->>>>><<")
     for (let i = 0; i < 8; i++) {
       let bitmap = [0];
-      if(dataReport[startIndex + i].ResultReport !='N/A'){
-      bitmap = fs.readFileSync(
+      if (dataReport[startIndex + i].ResultReport != 'N/A') {
+        bitmap = fs.readFileSync(
           "C:\\AutomationProject\\SAR\\asset\\" +
-            dataReport[startIndex + i].ResultReport
+          dataReport[startIndex + i].ResultReport
         );
       }
-     
+
       var picResize = await ResizeBase64(bitmap);
       buffpicResize.push(picResize);
     }
@@ -1172,8 +1176,8 @@ async function SignSet(dataReport, doc, currentY) {
             try {
               let bitmap = fs.readFileSync(
                 "C:\\AutomationProject\\SAR\\asset_ts\\Sign_Pic\\" +
-                  dataInTable[3][data.column.index] +
-                  ".jpg"
+                dataInTable[3][data.column.index] +
+                ".jpg"
               );
               doc.addImage(
                 bitmap.toString("base64"),
