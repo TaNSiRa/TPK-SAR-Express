@@ -17,6 +17,7 @@ exports.CreateReport = async (reqNo) => {
     //console.log(dataReport);
     //var dataReport = new ReportData_Structure();
     dataReport = buffDataIn.recordset;
+    // console.log(dataReport);
     dataReport = await this.ReplaceItemName(dataReport);
     var pdf = await createpdf.SelectPattern(dataReport);
 
@@ -29,7 +30,7 @@ exports.CreateReport = async (reqNo) => {
 };
 
 exports.ReplaceItemName = async (dataIn) => {
-  //console.log("in");
+  // console.log("in");
   for (let i = 0; i < dataIn.length; i++) {
     dataIn[i].ItemReportName = String(dataIn[i].ItemReportName).replace(
       "(g/m2)",
@@ -51,7 +52,7 @@ exports.ReplaceItemName = async (dataIn) => {
       "(C",
       "(°C"
     );
-    //console.log(dataIn[i].ItemReportName);
+    // console.log(dataIn[i].ItemReportName);
   }
 
   return dataIn;

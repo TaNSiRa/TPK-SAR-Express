@@ -39,7 +39,7 @@ exports.CreatePDF = async (dataReport) => {
       if (
         i != 0 &&
         dtget.toDateOnly(dataBuff[i].SamplingDate) !=
-          dtget.toDateOnly(dataBuff[i - 1].SamplingDate)
+        dtget.toDateOnly(dataBuff[i - 1].SamplingDate)
       ) {
         j++;
         dataBuffSet.push([]);
@@ -129,8 +129,8 @@ exports.CreatePDF = async (dataReport) => {
 
     await doc.save(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
 
     console.log("end SavePDF");
@@ -138,8 +138,8 @@ exports.CreatePDF = async (dataReport) => {
     //console.log(doc.output('datauristring'));
     var bitmap = fs.readFileSync(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
     // convert binary data to base64 encoded string
     //console.log(doc.output());
@@ -184,7 +184,7 @@ exports.CreatePDFA3 = async (dataReport) => {
       if (
         i != 0 &&
         dtget.toDateOnly(dataBuff[i].SamplingDate) !=
-          dtget.toDateOnly(dataBuff[i - 1].SamplingDate)
+        dtget.toDateOnly(dataBuff[i - 1].SamplingDate)
       ) {
         j++;
         dataBuffSet.push([]);
@@ -274,8 +274,8 @@ exports.CreatePDFA3 = async (dataReport) => {
 
     await doc.save(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
 
     console.log("end SavePDF");
@@ -283,8 +283,8 @@ exports.CreatePDFA3 = async (dataReport) => {
     //console.log(doc.output('datauristring'));
     var bitmap = fs.readFileSync(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
     // convert binary data to base64 encoded string
     //console.log(doc.output());

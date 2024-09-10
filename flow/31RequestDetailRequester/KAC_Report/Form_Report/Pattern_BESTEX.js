@@ -10,7 +10,7 @@ const { VarBinary } = require("mssql");
 
 exports.CreatePDF = async (dataReport) => {
   try {
-    console.log("CreatePDF APM");
+    console.log("CreatePDF BESTEX");
     var CustFull = dataReport[0].CustFull;
     var monthRequest = dtget.toMonthOnly(dataReport[0].SamplingDate);
     var yearRequest = dtget.toYearOnly(dataReport[0].SamplingDate);
@@ -23,7 +23,7 @@ exports.CreatePDF = async (dataReport) => {
     AND YEAR(SamplingDate) = ${yearRequest} order by SamplingDate,reportorder`
     );
     dataBuff = dataBuff.recordset;
-
+    // console.log(dataBuff.recordset);
     //manageData
     //Separate by sampling date
     var dataBuffSet = [];
@@ -43,6 +43,49 @@ exports.CreatePDF = async (dataReport) => {
       dataBuffSet[j].push(dataBuff[i]);
     }
     var currentRound = dataBuffSet.length;
+
+    //add missing data Mn ,Ni ,T-Cr
+    if (currentRound > 1) {
+      for (var j = 1; j < currentRound; j++) {
+        dataBuffSet[j].splice(
+          17,
+          0,
+          {
+            SamplingDate: "-",
+            ProcessReportName: "-",
+            ItemReportName: "-",
+            ControlRange: "-",
+            ResultReport: "-",
+            Evaluation: "-",
+          },
+          {
+            SamplingDate: "-",
+            ProcessReportName: "-",
+            ItemReportName: "-",
+            ControlRange: "-",
+            ResultReport: "-",
+            Evaluation: "-",
+          }
+        );
+      }
+    }
+    //add missing data Mn ,Ni ,T-Cr
+    if (currentRound > 1) {
+      for (var j = 1; j < currentRound; j++) {
+        dataBuffSet[j].splice(
+          20,
+          0,
+          {
+            SamplingDate: "-",
+            ProcessReportName: "-",
+            ItemReportName: "-",
+            ControlRange: "-",
+            ResultReport: "-",
+            Evaluation: "-",
+          }
+        );
+      }
+    }
 
     //add blank week data
     for (var i = currentRound; i < 4; i++) {

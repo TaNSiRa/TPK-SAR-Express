@@ -91,9 +91,11 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
           break;
         }
       }
+      let processName = dataReport[0][i].ProcessReportName;
+      processName = processName.replace("(mg/m2)", "(mg/m²)");
       dataInHeader[1].push({
         colSpan: countColSpan,
-        content: dataReport[0][i].ProcessReportName,
+        content: processName,
         styles: styleRowHeadBlue,
       });
       i = k;
@@ -119,7 +121,7 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
       fillColor: colorRow3,
       font: "THSarabun",
       fontStyle: "normal",
-      fontSize: 8,
+      fontSize: 6,
       cellWidth: cellDWidth,
     };
 
@@ -137,8 +139,19 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
     ]);
 
     for (let i = 0; i < dataReport[0].length; i++) {
+      // แก้ไข ItemReportName ที่นี่
+      let itemName = dataReport[0][i].ItemReportName;
+      itemName = itemName.replace("(g/m2)", "(g/m²)");
+      itemName = itemName.replace("(us/", "(µS/");
+      itemName = itemName.replace("(uS/", "(µS/");
+      itemName = itemName.replace("(oC", "(°C");
+      itemName = itemName.replace("(C", "(°C");
+
+      // แก้ไขให้ itemText มีการแทนที่คำที่ต้องการแล้ว
+      let itemText = itemName.replace(/ /g, "\n");
       dataInHeader[2].push({
         content: dataReport[0][i].ItemReportName,
+        content: itemText,
         styles: styleRow3D,
       });
     }
@@ -161,7 +174,7 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
       fillColor: colorRow4,
       font: "THSarabun",
       fontStyle: "normal",
-      fontSize: 8,
+      fontSize: 6,
     };
     var styleRow4Date = {
       textColor: 0,
@@ -323,9 +336,9 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
         if (checkHaveData2 == false) {
           styleData2 = styleDIntableNoData;
         } else if (
-          dataReport[j+1][i].Evaluation != "PASS" &&
-          dataReport[j+1][i].Evaluation != "-" &&
-          dataReport[j+1][i].Evaluation != ""
+          dataReport[j + 1][i].Evaluation != "PASS" &&
+          dataReport[j + 1][i].Evaluation != "-" &&
+          dataReport[j + 1][i].Evaluation != ""
         ) {
           styleData2 = styleDIntableError;
         } else {
@@ -666,6 +679,15 @@ exports.DataSetYearA3 = async (dataReport, doc, currentY) => {
       fontStyle: "normal",
       fontSize: fontSizeD,
     };
+    var styleDIntableNoData = {
+      textColor: 0,
+      halign: "center",
+      valign: "middle",
+      fillColor: [128, 128, 128],
+      font: "THSarabun",
+      fontStyle: "normal",
+      fontSize: 8,
+    };
     var styleRowHeadDBlue = {
       textColor: 0,
       halign: "center",
@@ -681,56 +703,95 @@ exports.DataSetYearA3 = async (dataReport, doc, currentY) => {
     for (let j = 0; j < 24; j = j + 2) {
       //add row month
       //set 1 (row J)
+      let checkHaveData1 = true;
+      let checkHaveData2 = true;
+      if (
+        dataReport[j][0].ResultReport == "-" &&
+        dataReport[j][1].ResultReport == "-" &&
+        dataReport[j][2].ResultReport == "-" &&
+        dataReport[j][3].ResultReport == "-"
+      ) {
+        checkHaveData1 = false;
+      }
+      if (
+        dataReport[j + 1][0].ResultReport == "-" &&
+        dataReport[j + 1][1].ResultReport == "-" &&
+        dataReport[j + 1][2].ResultReport == "-" &&
+        dataReport[j + 1][3].ResultReport == "-"
+      ) {
+        checkHaveData2 = false;
+      }
+
       dataInTable.push([
         { rowSpan: 2, content: months[j], styles: styleRowHeadDBlue },
-        {
-          content: dtget.toDateOnly(dataReport[j][0].SamplingDate),
-          styles: styleDIntable,
-        },
-        {
-          content: dtget.toDateOnly(dataReport[j][0].CreateReportDate),
-          styles: styleDIntable,
-        },
       ]);
+
+      dataInTable[j].push(
+        {
+          content: checkHaveData1
+            ? dtget.toDateOnly(dataReport[j][0].SamplingDate)
+            : "",
+          styles: checkHaveData1 ? styleDIntable : styleDIntableNoData,
+        },
+        {
+          content: checkHaveData1
+            ? dtget.toDateOnly(dataReport[j][0].CreateReportDate)
+            : "",
+          styles: checkHaveData1 ? styleDIntable : styleDIntableNoData,
+        }
+      );
       // set 2 (row J + 1)
       dataInTable.push([
         {
-          content: dtget.toDateOnly(dataReport[j + 1][0].SamplingDate),
-          styles: styleDIntable,
+          content: checkHaveData2
+            ? dtget.toDateOnly(dataReport[j + 1][0].SamplingDate)
+            : "",
+          styles: checkHaveData2 ? styleDIntable : styleDIntableNoData,
         },
         {
-          content: dtget.toDateOnly(dataReport[j + 1][0].CreateReportDate),
-          styles: styleDIntable,
+          content: checkHaveData2
+            ? dtget.toDateOnly(dataReport[j + 1][0].CreateReportDate)
+            : "",
+          styles: checkHaveData2 ? styleDIntable : styleDIntableNoData,
         },
       ]);
 
       //add data in row month
       for (let i = 0; i < dataReport[j].length; i++) {
         //set 1
-        let checkErrorOk = true;
-        if (
+        let styleData;
+        if (checkHaveData1 == false) {
+          styleData = styleDIntableNoData;
+        } else if (
           dataReport[j][i].Evaluation != "PASS" &&
           dataReport[j][i].Evaluation != "-" &&
           dataReport[j][i].Evaluation != ""
         ) {
-          checkErrorOk = false;
+          styleData = styleDIntableError;
+        } else {
+          styleData = styleDIntable;
         }
+
         dataInTable[j].push({
-          content: dataReport[j][i].ResultReport,
-          styles: checkErrorOk ? styleDIntable : styleDIntableError,
+          content: checkHaveData1 ? dataReport[j][i].ResultReport : "",
+          styles: styleData,
         });
         //set 2
-        let checkErrorOk2 = true;
-        if (
+        let styleData2;
+        if (checkHaveData2 == false) {
+          styleData2 = styleDIntableNoData;
+        } else if (
           dataReport[j + 1][i].Evaluation != "PASS" &&
           dataReport[j + 1][i].Evaluation != "-" &&
           dataReport[j + 1][i].Evaluation != ""
         ) {
-          checkErrorOk2 = false;
+          styleData2 = styleDIntableError;
+        } else {
+          styleData2 = styleDIntable;
         }
         dataInTable[j + 1].push({
-          content: dataReport[j + 1][i].ResultReport,
-          styles: checkErrorOk2 ? styleDIntable : styleDIntableError,
+          content: checkHaveData2 ? dataReport[j + 1][i].ResultReport : "",
+          styles: styleData2,
         });
       }
     }

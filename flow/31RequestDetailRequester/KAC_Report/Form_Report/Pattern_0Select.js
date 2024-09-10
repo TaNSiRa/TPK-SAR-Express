@@ -2,6 +2,7 @@ const Pattern_K1 = require("./Pattern_K1.js");
 const Pattern_K2 = require("./Pattern_K2.js");
 const Pattern_T1 = require("./Pattern_T1.js");
 const Pattern_NHK = require("./Pattern_NHK.js");
+const Pattern_NHKSTA = require("./Pattern_NHKSTA.js");
 const Pattern_TCFGU = require("./Pattern_TCFGU.js");
 const Pattern_VCCT = require("./Pattern_VCCT.js");
 const Pattern_BSI = require("./Pattern_BSI.js");
@@ -42,6 +43,7 @@ const Pattern_MMTH4 = require("./Pattern_MMTH4.js");
 const Pattern_SOI8 = require("./Pattern_SOI8.js");
 const Pattern_PLANT = require("./Pattern_PLANT.js");
 const Pattern_BESTEX = require("./Pattern_BESTEX.js");
+const Pattern_TMTS = require("./Pattern_TMTS.js");
 
 exports.SelectPattern = async (dataReport) => {
   try {
@@ -50,8 +52,8 @@ exports.SelectPattern = async (dataReport) => {
       var data = await Pattern_T1.CreatePDF(dataReport);
     } else if (dataReport[0].PatternReport == "NHK") {
       var data = await Pattern_NHK.CreatePDF(dataReport);
-    } else if (dataReport[0].PatternReport == "NHKSta") {
-      var data = await Pattern_NHK.CreatePDFSta(dataReport);
+    } else if (dataReport[0].PatternReport == "NHKSTA") {
+      var data = await Pattern_NHKSTA.CreatePDF(dataReport);
     } else if (dataReport[0].PatternReport == "K2") {
       var data = await Pattern_K2.CreatePDF(dataReport);
     } else if (dataReport[0].PatternReport == "TCFGU") {
@@ -146,6 +148,8 @@ exports.SelectPattern = async (dataReport) => {
       var data = await Pattern_PLANT.CreatePDF(dataReport);
     } else if (dataReport[0].PatternReport == "BESTEX") {
       var data = await Pattern_BESTEX.CreatePDF(dataReport);
+    } else if (dataReport[0].PatternReport == "TMTS") {
+      var data = await Pattern_TMTS.CreatePDF(dataReport);
     } else {
       {
         console.log("K1");

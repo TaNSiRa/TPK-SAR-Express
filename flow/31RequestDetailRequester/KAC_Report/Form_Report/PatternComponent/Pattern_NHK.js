@@ -63,7 +63,7 @@ exports.ZincNoPic = async (dataReport, doc, currentY) => {
             ) {
               if (
                 dataReport[i].ProcessReportName ==
-                  dataReport[i + j + 1].ProcessReportName &&
+                dataReport[i + j + 1].ProcessReportName &&
                 dataReport[i + j + 1].ReportOrder < 105
               ) {
                 countSpan++;
@@ -431,6 +431,140 @@ exports.ZincSet3Pic = async (dataReport, doc, currentY) => {
     var picSetData = [];
     var picHeight = 30;
     var picWidht = 40;
+    var runningPic = 0;
+    for (let i = 0; i < dataReport.length; i++) {
+      if (dataReport[i].ReportOrder >= 110) {
+        //picuter data start => 110 - 125
+        picSetData.push(dataReport[i].ResultReport);
+      }
+    }
+    //console.log(picSetData);
+    //SET PIC
+    dataInTable.push([
+      {
+        content: "",
+        styles: {
+          valign: "middle",
+          halign: "center",
+          minCellHeight: picHeight,
+        },
+      },
+      "",
+      "",
+    ]);
+
+    doc.autoTable({
+      startY: currentY + 4,
+      head: [["TOP", "CENTER", "BOTTOM"]],
+      headStyles: {
+        textColor: 0,
+        halign: "center",
+        valign: "middle",
+        fillColor: [140, 255, 219],
+        font: "THSarabun",
+        fontStyle: "bold",
+        fontSize: 15,
+        cellPadding: 1,
+        lineColor: 0,
+        lineWidth: 0.1,
+        maxCellHeight: 12,
+      },
+      body: dataInTable,
+      bodyStyles: {
+        textColor: 0,
+        halign: "center",
+        valign: "middle",
+        fillColor: [255, 255, 255],
+        font: "THSarabun",
+        fontStyle: "normal",
+        fontSize: 13,
+        cellPadding: 1,
+        lineColor: 0,
+        lineWidth: 0.1,
+        maxCellHeight: 12,
+        //cellWidth: 17,
+      },
+      columnStyles: {
+        0: { cellWidth: picWidht },
+        1: { cellWidth: picWidht },
+        2: { cellWidth: picWidht },
+        3: { cellWidth: picWidht },
+      },
+      allSectionHooks: true,
+      didDrawCell: function (data) {
+        if (data.section === "body") {
+          try {
+            let bitmap = fs.readFileSync(
+              "C:\\AutomationProject\\SAR\\asset\\" + picSetData[runningPic]
+            );
+            runningPic++;
+            doc.addImage(
+              bitmap.toString("base64"),
+              "jpg",
+              data.cell.x + 1,
+              data.cell.y + 1,
+              picWidht - 2,
+              picHeight - 2
+            );
+          } catch (err) {
+            runningPic++;
+            console.log("error pic" + err);
+          }
+        }
+      },
+      theme: "grid",
+    });
+
+    currentY = doc.lastAutoTable.finalY;
+    return [doc, currentY];
+  } catch (err) {
+    console.log(err);
+    return err;
+  }
+};
+
+exports.ZincSet3PicforNHK = async (dataReport, doc, currentY) => {
+  try {
+    console.log("ZincSet3PicforNHK");
+
+    if (currentY > 297 - 80) {
+      doc.addPage();
+      currentY = 10;
+    }
+
+    doc.autoTable({
+      startY: currentY + 4,
+      head: [
+        [
+          {
+            content: "Position on SEM x 500",
+            styles: {
+              textColor: 0,
+              halign: "center",
+              valign: "middle",
+              fillColor: [3, 244, 252],
+              font: "THSarabun",
+              fontStyle: "bold",
+              fontSize: 12,
+              cellPadding: 1,
+              lineColor: 0,
+              lineWidth: 0.1,
+              maxCellHeight: 12,
+              cellWidth: 50,
+            },
+          },
+        ],
+      ],
+      //body: body,
+      theme: "grid",
+    });
+    // add position pic
+    currentY = doc.lastAutoTable.finalY;
+
+    var dataInTable = [];
+    var picSetData = [];
+    var picHeight = 50;
+    var picWidht = 60;
     var runningPic = 0;
     for (let i = 0; i < dataReport.length; i++) {
       if (dataReport[i].ReportOrder >= 110) {
