@@ -7,7 +7,7 @@ const sql = require('mssql');
 // Configuration for SQL Server
 const config = {
   user: 'sa',
-  password: '12345678',
+  password: 'Automatic',
   database: 'SAR',
   server: '172.23.10.51',
   options: {
