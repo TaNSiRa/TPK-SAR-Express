@@ -31,16 +31,16 @@ exports.qurey = async (QueryText) => {
     console.log(`---------------`);
     await mssql.connect(config)
     const result = await mssql.query(QueryText).then((v) => {
-        // console.log(`---------------`);
-         //console.log(v.recordset);  
-        out = v;   
-        // console.log(`---------------`);
-        return v;
-      
-      }).then(() => mssql.close())
-    
-      //  console.dir(result)
-      return out;
+      // console.log(`---------------`);
+      //console.log(v.recordset);  
+      out = v;
+      // console.log(`---------------`);
+      return v;
+
+    }).then(() => mssql.close())
+
+    //  console.dir(result)
+    return out;
   } catch (err) {
     console.log(err);
     return "err";

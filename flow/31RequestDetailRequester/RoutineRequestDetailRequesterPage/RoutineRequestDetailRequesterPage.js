@@ -132,8 +132,7 @@ router.post(
       query =
         query +
         `Inchargetime = null,SubLeaderTime = null,GLTime=null,DGMTime=null,JPTime=null,
-        ReportRejectRemark ='${user} : ${dtget.DateNow()} : ${
-          dataIn[0].ReportRejectRemark
+        ReportRejectRemark ='${user} : ${dtget.DateNow()} : ${dataIn[0].ReportRejectRemark
         }'`;
 
       //update time show on report by user login
@@ -188,11 +187,11 @@ router.post(
         buffName,
         "REPORT " + dataIn[0].CustFull + "  REJECT",
         "REPORT " +
-          dataIn[0].CustFull +
-          " REJECT   @ " +
-          dt +
-          "\n" +
-          dataIn[0].ReportRejectRemark
+        dataIn[0].CustFull +
+        " REJECT   @ " +
+        dt +
+        "\n" +
+        dataIn[0].ReportRejectRemark
       );
 
       res.send("ok");

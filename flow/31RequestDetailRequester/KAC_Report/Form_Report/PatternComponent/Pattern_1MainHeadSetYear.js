@@ -477,7 +477,7 @@ exports.HeaderSetYearA3 = async (dataReport, doc) => {
     //currentY = currentY + picHigh;
 
     let docNumber = await exports.MasterYearlyDocument();
-    
+
     doc.autoTable({
       startY: currentY,
       head: [

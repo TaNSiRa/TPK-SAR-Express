@@ -5,13 +5,14 @@ const request = require("request-promise-native");
 const file = fs.createWriteStream("file.pdf");
 exports.request = async () => {
   http.get(
-    "http://127.0.0.1/ReportServer?%2fReport+Project1%2fSAR_KAC&rs:Format=PDF&rs:ClearSession=true&rs:Command=Render&ReqNo=RTB-MKT-22-002", 
+    "http://127.0.0.1/ReportServer?%2fReport+Project1%2fSAR_KAC&rs:Format=PDF&rs:ClearSession=true&rs:Command=Render&ReqNo=RTB-MKT-22-002",
     {
       'auth': {
         'user': 'Administrator',
         'pass': 'Report1234',
         'sendImmediately': false
-      }},
+      }
+    },
     function (response) {
       response.pipe(file);
       console.log(file);

@@ -24,9 +24,9 @@ exports.loginServer = async () => {
       password: "Report1234",
     }; */
     var soapConfig = {
-        username: "sa",
-        password: "Automatic",
-      };
+      username: "sa",
+      password: "Automatic",
+    };
     ssrs.start(url, soapConfig, null, serverConfig);
 
     /*     var format = "pdf";

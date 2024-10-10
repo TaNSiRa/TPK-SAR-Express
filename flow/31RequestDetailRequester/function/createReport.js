@@ -33,6 +33,10 @@ exports.ReplaceItemName = async (dataIn) => {
   // console.log("in");
   for (let i = 0; i < dataIn.length; i++) {
     dataIn[i].ItemReportName = String(dataIn[i].ItemReportName).replace(
+      "(mg/m2)",
+      "(mg/m²)"
+    );
+    dataIn[i].ItemReportName = String(dataIn[i].ItemReportName).replace(
       "(g/m2)",
       "(g/m²)"
     );
@@ -51,6 +55,10 @@ exports.ReplaceItemName = async (dataIn) => {
     dataIn[i].ItemReportName = String(dataIn[i].ItemReportName).replace(
       "(C",
       "(°C"
+    );
+    dataIn[i].ControlRange = String(dataIn[i].ControlRange).replace(
+      "mg/m2",
+      "mg/m²"
     );
     // console.log(dataIn[i].ItemReportName);
   }

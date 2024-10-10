@@ -169,12 +169,12 @@ exports.SignSet = async (dataReport, doc, currentY) => {
       ],
       [
         dtConv.toDateOnly(dataReport[0].JPTime) || "",
-        dtConv.toDateOnly(dataReport[0].DGMTime)|| "",
+        dtConv.toDateOnly(dataReport[0].DGMTime) || "",
         dtConv.toDateOnly(dataReport[0].GLTime) || "",
         dtConv.toDateOnly(dataReport[0].SubLeaderTime) || "",
         dtConv.toDateOnly(dataReport[0].InchargeTime) || "",
       ],
-      [        
+      [
         dataReport[0].JP || "",
         dataReport[0].DGM || "",
         dataReport[0].GL || "",
@@ -352,8 +352,8 @@ exports.SignSet = async (dataReport, doc, currentY) => {
               try {
                 let bitmap = fs.readFileSync(
                   "C:\\AutomationProject\\SAR\\asset_ts\\Sign_Pic\\" +
-                    dataInTable[3][data.column.index] +
-                    ".jpg"
+                  dataInTable[3][data.column.index] +
+                  ".jpg"
                 );
                 doc.addImage(
                   bitmap.toString("base64"),
@@ -423,8 +423,635 @@ exports.SignSet = async (dataReport, doc, currentY) => {
               try {
                 let bitmap = fs.readFileSync(
                   "C:\\AutomationProject\\SAR\\asset_ts\\Sign_Pic\\" +
-                    dataInTable[3][data.column.index] +
-                    ".jpg"
+                  dataInTable[3][data.column.index] +
+                  ".jpg"
+                );
+                doc.addImage(
+                  bitmap.toString("base64"),
+                  "jpg",
+                  data.cell.x + 1,
+                  data.cell.y + 1,
+                  signWidth - 2,
+                  signHeight - 2
+                );
+              } catch (err) {
+                //console.log(err);
+              }
+              /* doc.addImage(
+              coinBase64Img,
+              "PNG",
+
+              5,
+              5
+            ); */
+            }
+          }
+        },
+      });
+    }
+    currentY = doc.lastAutoTable.finalY;
+    return [doc, currentY];
+  } catch (err) {
+    console.log(err);
+    return err;
+  }
+};
+
+exports.SignSetforPHODAIHAN = async (dataReport, doc, currentY) => {
+  try {
+    console.log("SignSet");
+    //spans();
+    var signCount = 0;
+    var signWidth = 25;
+    var signHeight = 14;
+    var fontSize = 10;
+    var cellStyle = {
+      textColor: 0,
+      font: "THSarabun",
+      fontStyle: "bold",
+      fontSize: fontSize,
+      valign: "middle",
+      halign: "center",
+      cellWidth: signWidth,
+      cellPadding: 0.1,
+      lineColor: 0,
+      lineWidth: 0.5,
+    };
+    var dataInTable = [
+      [
+        "Inspected by",
+        "Checked by",
+        "Approved by",
+      ],
+      [
+        {
+          content: "",
+          styles: {
+            valign: "middle",
+            halign: "center",
+            minCellHeight: signHeight,
+          },
+        },
+        {
+          content: "",
+          styles: {
+            valign: "middle",
+            halign: "center",
+            minCellHeight: signHeight,
+          },
+        },
+        {
+          content: "",
+          styles: {
+            valign: "middle",
+            halign: "center",
+            minCellHeight: signHeight,
+          },
+        },
+      ],
+      [
+        dtConv.toDateOnly(dataReport[0].InchargeTime) || "",
+        dtConv.toDateOnly(dataReport[0].SubLeaderTime) || "",
+        dtConv.toDateOnly(dataReport[0].GLTime) || "",
+      ],
+      [
+        dataReport[0].Incharge || "",
+        dataReport[0].SubLeader || "",
+        dataReport[0].GL || "",
+      ],
+    ];
+
+    if (dataReport[0].Incharge == "" || dataReport[0].Incharge == "-") {
+      for (var i = 0; i < 2; i++) {
+        dataInTable[i].splice(0, 1);
+      }
+    } else {
+      signCount++;
+    }
+    if (dataReport[0].SubLeader == "" || dataReport[0].SubLeader == "-") {
+      for (var i = 0; i < 2; i++) {
+        dataInTable[i].splice(1, 1);
+      }
+    } else {
+      signCount++;
+    }
+    if (dataReport[0].GL == "" || dataReport[0].GL == "-") {
+      for (var i = 0; i < 2; i++) {
+        dataInTable[i].splice(2, 1);
+      }
+    } else {
+      signCount++;
+    }
+
+    /*     for (let i = 0; i < 4; i++) {
+      dataInTable[i].rowspan = 1;
+      dataInTable[i].content = 1;
+
+      dataInTable[i].styles = { valign: "middle", halign: "center" };
+    } */
+    /* var dataInTable = [
+      [
+        {
+          c1: "Approved by",
+          c2: "Approved by",
+          c3: "Approved by",
+          c4: "Checked by",
+          c5: "Issued by",
+        },
+      ],
+      [
+        {
+          c1: dataReport[0].DGM || "",
+          c2: dataReport[0].JP || "",
+          c3: dataReport[0].GL || "",
+          c4: dataReport[0].SubLeader || "",
+          c5: dataReport[0].Incharge || "",
+        },
+      ],
+      [
+        {
+          c1: dtConv.toDateOnly(dataReport[0].DGMTime),
+          c2: dtConv.toDateOnly(dataReport[0].JPTime) || "",
+          c3: dtConv.toDateOnly(dataReport[0].GLTime) || "",
+          c4: dtConv.toDateOnly(dataReport[0].SubLeaderTime) || "",
+          c5: dtConv.toDateOnly(dataReport[0].InchargeTime) || "",
+        },
+      ],
+      [
+        {
+          c1: dataReport[0].DGM || "",
+          c2: dataReport[0].JP || "",
+          c3: dataReport[0].GL || "",
+          c4: dataReport[0].SubLeader || "",
+          c5: dataReport[0].Incharge || "",
+        },
+      ],
+    ];
+
+    if (dataReport[0].DGM == "" || dataReport[0].DGM == "-") {
+      for (var i = 0; i < 4; i++) {
+        delete dataInTable[i].c1;
+      }
+      signCount++;
+    }
+    if (dataReport[0].JP == "" || dataReport[0].JP == "-") {
+      for (var i = 0; i < 4; i++) {
+        delete dataInTable[i].c2;
+      }
+      signCount++;
+    }
+    if (dataReport[0].GL == "" || dataReport[0].GL == "-") {
+      for (var i = 0; i < 4; i++) {
+        delete dataInTable[i].c3;
+      }
+      signCount++;
+    }
+    if (dataReport[0].SubLeader == "" || dataReport[0].SubLeader == "-") {
+      for (var i = 0; i < 4; i++) {
+        delete dataInTable[i].c4;
+      }
+      signCount++;
+    }
+    if (dataReport[0].Incharge == "" || dataReport[0].Incharge == "-") {
+      for (var i = 0; i < 4; i++) {
+        delete dataInTable[i].c4;
+      }
+      signCount++;
+    }
+    console.log(dataInTable);
+    for (let i = 0; i < 4; i++) {
+      dataInTable[i].rowspan = 1;
+      dataInTable[i].content = 1;
+
+      dataInTable[i].styles = { valign: "middle", halign: "center" };
+    } */
+    //console.log(dataInTable);
+    //Add Sign Table
+    var margin = ((210 - signCount * signWidth) / 2) + 52.5;
+    // magin page left right
+    if (signCount <= 2) {
+      doc.autoTable({
+        startY: currentY,
+        body: dataInTable,
+        columnStyles: {
+          0: cellStyle,
+          1: cellStyle,
+          2: cellStyle,
+        },
+        theme: "grid",
+        margin: { left: margin },
+        didDrawCell: function (data) {
+          if (data.row.index == [1]) {
+            //แถวรูป index 1 ใช้คำสั่งนี้เพื่อดึงค่าพิกัด xy มา plot รุปทับตาราง
+            //console.log(data.cell.raw + "|" + data.column.index);
+            //console.log(dataInTable[2][data.column.index]);
+            //check time sign
+            if (dataInTable[2][data.column.index] != "") {
+              //console.log(dataInTable[2][data.column.index]);
+              //console.log(dataInTable[3][data.column.index]);
+              try {
+                let bitmap = fs.readFileSync(
+                  "C:\\AutomationProject\\SAR\\asset_ts\\Sign_Pic\\" +
+                  dataInTable[3][data.column.index] +
+                  ".jpg"
+                );
+                doc.addImage(
+                  bitmap.toString("base64"),
+                  "jpg",
+                  data.cell.x + 1,
+                  data.cell.y + 1,
+                  signWidth - 2,
+                  signHeight - 2
+                );
+              } catch (err) {
+                //console.log(err);
+              }
+              /* doc.addImage(
+                coinBase64Img,
+                "PNG",
+  
+                5,
+                5
+              ); */
+            }
+          }
+        },
+      });
+    } else {
+      doc.autoTable({
+        startY: currentY,
+        body: dataInTable,
+        columnStyles: {
+          0: cellStyle,
+          1: cellStyle,
+          2: cellStyle,
+        },
+        theme: "grid",
+        margin: { left: margin },
+        didDrawCell: function (data) {
+          if (data.row.index == [1]) {
+            //แถวรูป index 1 ใช้คำสั่งนี้เพื่อดึงค่าพิกัด xy มา plot รุปทับตาราง
+            //console.log(data.cell.raw + "|" + data.column.index);
+            //console.log(dataInTable[2][data.column.index]);
+            //check time sign
+            if (dataInTable[2][data.column.index] != "") {
+              //console.log(dataInTable[2][data.column.index]);
+              //console.log(dataInTable[3][data.column.index]);
+              try {
+                let bitmap = fs.readFileSync(
+                  "C:\\AutomationProject\\SAR\\asset_ts\\Sign_Pic\\" +
+                  dataInTable[3][data.column.index] +
+                  ".jpg"
+                );
+                doc.addImage(
+                  bitmap.toString("base64"),
+                  "jpg",
+                  data.cell.x + 1,
+                  data.cell.y + 1,
+                  signWidth - 2,
+                  signHeight - 2
+                );
+              } catch (err) {
+                //console.log(err);
+              }
+              /* doc.addImage(
+              coinBase64Img,
+              "PNG",
+
+              5,
+              5
+            ); */
+            }
+          }
+        },
+      });
+    }
+    currentY = doc.lastAutoTable.finalY;
+    return [doc, currentY];
+  } catch (err) {
+    console.log(err);
+    return err;
+  }
+};
+
+exports.SignSetForGASBP = async (dataReport, doc, currentY) => {
+  try {
+    console.log("SignSetForGASBP");
+    //spans();
+    var signCount = 0;
+    var signWidth = 25;
+    var signHeight = 14;
+    var fontSize = 10;
+    var cellStyle = {
+      textColor: 0,
+      font: "THSarabun",
+      fontStyle: "bold",
+      fontSize: fontSize,
+      valign: "middle",
+      halign: "center",
+      cellWidth: signWidth,
+      //maxCellHeight: 3,
+      cellPadding: 0.1,
+      lineColor: 0,
+      lineWidth: 0.1,
+    };
+    var dataInTable = [
+      [
+        /* {
+          content: "Approved by",
+          styles: { valign: "middle", halign: "center", cellWidth: signWidth },
+        },
+        {
+          content: "Approved by",
+          styles: { valign: "middle", halign: "center", cellWidth: signWidth },
+        },
+        {
+          content: "Approved by",
+          styles: { valign: "middle", halign: "center", cellWidth: signWidth },
+        },
+        {
+          content: "Checked by",
+          styles: { valign: "middle", halign: "center", cellWidth: signWidth },
+        },
+        {
+          content: "Issued by",
+          styles: { valign: "middle", halign: "center", cellWidth: signWidth },
+        }, */
+        "Approved by",
+        "Approved by",
+        "Issued by",
+      ],
+      [
+        {
+          content: "",
+          styles: {
+            valign: "middle",
+            halign: "center",
+            minCellHeight: signHeight,
+          },
+        },
+        {
+          content: "",
+          styles: {
+            valign: "middle",
+            halign: "center",
+            minCellHeight: signHeight,
+          },
+        },
+        {
+          content: "",
+          styles: {
+            valign: "middle",
+            halign: "center",
+            minCellHeight: signHeight,
+          },
+        },
+        /* dataReport[0].DGM || "",
+        dataReport[0].JP || "",
+        dataReport[0].GL || "",
+        dataReport[0].SubLeader || "",
+        dataReport[0].Incharge || "", */
+      ],
+      [
+        "",
+        "",
+        "",
+      ],
+      [
+        "",
+        "",
+        "",
+      ],
+    ];
+
+    if (dataReport[0].Incharge == "" || dataReport[0].Incharge == "-") {
+      for (var i = 0; i < 4; i++) {
+        dataInTable[i].splice(4, 1);
+      }
+    } else {
+      signCount++;
+    }
+    if (dataReport[0].SubLeader == "" || dataReport[0].SubLeader == "-") {
+      for (var i = 0; i < 4; i++) {
+        dataInTable[i].splice(3, 1);
+      }
+    } else {
+      signCount++;
+    }
+    if (dataReport[0].GL == "" || dataReport[0].GL == "-") {
+      for (var i = 0; i < 4; i++) {
+        dataInTable[i].splice(2, 1);
+      }
+    } else {
+      signCount++;
+    }
+
+
+    /*     for (let i = 0; i < 4; i++) {
+      dataInTable[i].rowspan = 1;
+      dataInTable[i].content = 1;
+
+      dataInTable[i].styles = { valign: "middle", halign: "center" };
+    } */
+    /* var dataInTable = [
+      [
+        {
+          c1: "Approved by",
+          c2: "Approved by",
+          c3: "Approved by",
+          c4: "Checked by",
+          c5: "Issued by",
+        },
+      ],
+      [
+        {
+          c1: dataReport[0].DGM || "",
+          c2: dataReport[0].JP || "",
+          c3: dataReport[0].GL || "",
+          c4: dataReport[0].SubLeader || "",
+          c5: dataReport[0].Incharge || "",
+        },
+      ],
+      [
+        {
+          c1: dtConv.toDateOnly(dataReport[0].DGMTime),
+          c2: dtConv.toDateOnly(dataReport[0].JPTime) || "",
+          c3: dtConv.toDateOnly(dataReport[0].GLTime) || "",
+          c4: dtConv.toDateOnly(dataReport[0].SubLeaderTime) || "",
+          c5: dtConv.toDateOnly(dataReport[0].InchargeTime) || "",
+        },
+      ],
+      [
+        {
+          c1: dataReport[0].DGM || "",
+          c2: dataReport[0].JP || "",
+          c3: dataReport[0].GL || "",
+          c4: dataReport[0].SubLeader || "",
+          c5: dataReport[0].Incharge || "",
+        },
+      ],
+    ];
+
+    if (dataReport[0].DGM == "" || dataReport[0].DGM == "-") {
+      for (var i = 0; i < 4; i++) {
+        delete dataInTable[i].c1;
+      }
+      signCount++;
+    }
+    if (dataReport[0].JP == "" || dataReport[0].JP == "-") {
+      for (var i = 0; i < 4; i++) {
+        delete dataInTable[i].c2;
+      }
+      signCount++;
+    }
+    if (dataReport[0].GL == "" || dataReport[0].GL == "-") {
+      for (var i = 0; i < 4; i++) {
+        delete dataInTable[i].c3;
+      }
+      signCount++;
+    }
+    if (dataReport[0].SubLeader == "" || dataReport[0].SubLeader == "-") {
+      for (var i = 0; i < 4; i++) {
+        delete dataInTable[i].c4;
+      }
+      signCount++;
+    }
+    if (dataReport[0].Incharge == "" || dataReport[0].Incharge == "-") {
+      for (var i = 0; i < 4; i++) {
+        delete dataInTable[i].c4;
+      }
+      signCount++;
+    }
+    console.log(dataInTable);
+    for (let i = 0; i < 4; i++) {
+      dataInTable[i].rowspan = 1;
+      dataInTable[i].content = 1;
+
+      dataInTable[i].styles = { valign: "middle", halign: "center" };
+    } */
+    //console.log(dataInTable);
+    //Add Sign Table
+    var margin = (210 - signCount * signWidth) / 2;
+    // magin page left right
+    if (signCount <= 2) {
+      doc.autoTable({
+        startY: currentY,
+        head: [
+          [
+            {
+              content: "Heat & Surface Treatment",
+              colSpan: signCount,
+              styles: {
+                textColor: 0,
+                halign: "center",
+                valign: "middle",
+                fillColor: [255, 255, 255],
+                font: "THSarabun",
+                fontStyle: "bold",
+                fontSize: fontSize,
+                cellPadding: 0.1,
+                lineColor: 0,
+                lineWidth: 0.1,
+                minCellHeight: 5,
+              },
+            },
+          ],
+        ],
+        body: dataInTable,
+        columnStyles: {
+          0: cellStyle,
+          1: cellStyle,
+          2: cellStyle,
+          3: cellStyle,
+          4: cellStyle,
+        },
+        theme: "grid",
+        margin: { left: margin },
+        didDrawCell: function (data) {
+          if (data.row.index == [1]) {
+            //แถวรูป index 1 ใช้คำสั่งนี้เพื่อดึงค่าพิกัด xy มา plot รุปทับตาราง
+            //console.log(data.cell.raw + "|" + data.column.index);
+            //console.log(dataInTable[2][data.column.index]);
+            //check time sign
+            if (dataInTable[2][data.column.index] != "") {
+              //console.log(dataInTable[2][data.column.index]);
+              //console.log(dataInTable[3][data.column.index]);
+              try {
+                let bitmap = fs.readFileSync(
+                  "C:\\AutomationProject\\SAR\\asset_ts\\Sign_Pic\\" +
+                  dataInTable[3][data.column.index] +
+                  ".jpg"
+                );
+                doc.addImage(
+                  bitmap.toString("base64"),
+                  "jpg",
+                  data.cell.x + 1,
+                  data.cell.y + 1,
+                  signWidth - 2,
+                  signHeight - 2
+                );
+              } catch (err) {
+                //console.log(err);
+              }
+              /* doc.addImage(
+                coinBase64Img,
+                "PNG",
+  
+                5,
+                5
+              ); */
+            }
+          }
+        },
+      });
+    } else {
+      doc.autoTable({
+        startY: currentY,
+        head: [
+          [
+            {
+              content: "Heat & Surface Treatment",
+              colSpan: signCount,
+              styles: {
+                textColor: 0,
+                halign: "center",
+                valign: "middle",
+                fillColor: [255, 255, 255],
+                font: "THSarabun",
+                fontStyle: "bold",
+                fontSize: fontSize,
+                cellPadding: 0.1,
+                lineColor: 0,
+                lineWidth: 0.1,
+                minCellHeight: 5,
+              },
+            },
+          ],
+        ],
+        body: dataInTable,
+        columnStyles: {
+          0: cellStyle,
+          1: cellStyle,
+          2: cellStyle,
+          3: cellStyle,
+          4: cellStyle,
+        },
+        theme: "grid",
+        margin: { left: margin },
+        didDrawCell: function (data) {
+          if (data.row.index == [1]) {
+            //แถวรูป index 1 ใช้คำสั่งนี้เพื่อดึงค่าพิกัด xy มา plot รุปทับตาราง
+            //console.log(data.cell.raw + "|" + data.column.index);
+            //console.log(dataInTable[2][data.column.index]);
+            //check time sign
+            if (dataInTable[2][data.column.index] != "") {
+              //console.log(dataInTable[2][data.column.index]);
+              //console.log(dataInTable[3][data.column.index]);
+              try {
+                let bitmap = fs.readFileSync(
+                  "C:\\AutomationProject\\SAR\\asset_ts\\Sign_Pic\\" +
+                  dataInTable[3][data.column.index] +
+                  ".jpg"
                 );
                 doc.addImage(
                   bitmap.toString("base64"),

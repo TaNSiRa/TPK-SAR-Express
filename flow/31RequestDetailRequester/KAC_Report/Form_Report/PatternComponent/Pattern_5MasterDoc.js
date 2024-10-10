@@ -64,7 +64,7 @@ exports.MasterWeeklyDocument = async (doc) => {
       var pageWidth = doc.internal.pageSize.width;
       doc.setFont("THSarabun", "normal");
       doc.setFontSize(12);
-      
+
       // เปรียบเทียบ CreateReportDate กับวันที่ 24 Jun 2024
       if (new Date(createReportDate) < new Date('2024-06-24')) {
         console.log(createReportDate);
@@ -115,7 +115,7 @@ exports.MasterWeeklyDocument1 = async (doc) => {
       var pageWidth = doc.internal.pageSize.width;
       doc.setFont("THSarabun", "normal");
       doc.setFontSize(12);
-      
+
       // เปรียบเทียบ CreateReportDate กับวันที่ 24 Jun 2024
       if (new Date(createReportDate) < new Date('2024-06-24')) {
         console.log(createReportDate);

@@ -44,6 +44,9 @@ const Pattern_SOI8 = require("./Pattern_SOI8.js");
 const Pattern_PLANT = require("./Pattern_PLANT.js");
 const Pattern_BESTEX = require("./Pattern_BESTEX.js");
 const Pattern_TMTS = require("./Pattern_TMTS.js");
+const Pattern_AAB = require("./Pattern_AAB.js");
+const Pattern_PHODAIHAN = require("./Pattern_PHODAIHAN.js");
+const Pattern_GASBP = require("./Pattern_GASBP.js");
 
 exports.SelectPattern = async (dataReport) => {
   try {
@@ -150,6 +153,12 @@ exports.SelectPattern = async (dataReport) => {
       var data = await Pattern_BESTEX.CreatePDF(dataReport);
     } else if (dataReport[0].PatternReport == "TMTS") {
       var data = await Pattern_TMTS.CreatePDF(dataReport);
+    } else if (dataReport[0].PatternReport == "AAB") {
+      var data = await Pattern_AAB.CreatePDF(dataReport);
+    } else if (dataReport[0].PatternReport == "PHODAIHAN") {
+      var data = await Pattern_PHODAIHAN.CreatePDF(dataReport);
+    } else if (dataReport[0].PatternReport == "GASBP") {
+      var data = await Pattern_GASBP.CreatePDF(dataReport);
     } else {
       {
         console.log("K1");

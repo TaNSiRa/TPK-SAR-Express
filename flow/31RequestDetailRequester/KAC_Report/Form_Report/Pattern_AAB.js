@@ -45,7 +45,7 @@ exports.CreatePDF = async (dataReport) => {
     currentY = buffDoc[1];
 
     //Set Pic
-    buffDoc = await Pattern_MainP.PicSet(dataReport, doc, currentY);
+    buffDoc = await Pattern_MainP.PicSetforAAB(dataReport, doc, currentY);
     doc = buffDoc[0];
     currentY = buffDoc[1];
 

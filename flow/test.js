@@ -34,7 +34,7 @@ router.post("/testpdf", async (req, res) => {
 router.post("/testmail", async (req, res) => {
   console.log("test mail");
   try {
-    await nodemailer.MKTSendCompleteReport("RTR-MKT-22-030","ARSA CHUMNANDECHAKUL","REPORT CUST xx COMPLETE","REPORT CUST xx COMPLETE DATE");
+    await nodemailer.MKTSendCompleteReport("RTR-MKT-22-030", "ARSA CHUMNANDECHAKUL", "REPORT CUST xx COMPLETE", "REPORT CUST xx COMPLETE DATE");
     res.send("pic64");
   } catch (error) {
     //res.json(error);

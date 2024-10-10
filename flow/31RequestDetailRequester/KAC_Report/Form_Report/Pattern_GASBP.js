@@ -36,7 +36,7 @@ exports.CreatePDF = async (dataReport) => {
     doc = buffDoc[0];
     currentY = buffDoc[1];
     //SignSet
-    buffDoc = await Pattern_MainH.SignSet(dataReport, doc, currentY);
+    buffDoc = await Pattern_MainH.SignSetForGASBP(dataReport, doc, currentY);
     doc = buffDoc[0];
     currentY = buffDoc[1];
     //Data Set
