@@ -9,7 +9,7 @@ const config = {
   user: 'sa',
   password: '12345678',
   database: 'SAR',
-  server: '127.0.0.1',
+  server: '172.23.10.51',
   options: {
     encrypt: false, // Use this if you're connecting to a local SQL Server
     enableArithAbort: true
