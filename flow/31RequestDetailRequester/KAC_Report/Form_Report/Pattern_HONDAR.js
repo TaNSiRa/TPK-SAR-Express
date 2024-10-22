@@ -36,7 +36,7 @@ exports.CreatePDF = async (dataReport) => {
       if (
         i != 0 &&
         dtget.toDateOnly(dataBuff[i].SamplingDate) !=
-          dtget.toDateOnly(dataBuff[i - 1].SamplingDate)
+        dtget.toDateOnly(dataBuff[i - 1].SamplingDate)
       ) {
         j++;
         dataBuffSet.push([]);
@@ -100,7 +100,7 @@ exports.CreatePDF = async (dataReport) => {
       dataBuffSet[j][8].ProcessReportName = "Degreasing (FC-E2032T)";
       dataBuffSet[j][9].ProcessReportName = "Degreasing (FC-E2032T)";
       dataBuffSet[j][8].ControlRange = "<5.0";
-      
+
     }
 
     //add missing data z c f-f
@@ -205,8 +205,8 @@ exports.CreatePDF = async (dataReport) => {
 
     await doc.save(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
 
     console.log("end SavePDF");
@@ -214,8 +214,8 @@ exports.CreatePDF = async (dataReport) => {
     //console.log(doc.output('datauristring'));
     var bitmap = fs.readFileSync(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
-        dataReport[0].ReqNo +
-        ".pdf"
+      dataReport[0].ReqNo +
+      ".pdf"
     );
     // convert binary data to base64 encoded string
     //console.log(doc.output());
@@ -544,11 +544,11 @@ async function DataSet(dataReport, CurrentRound, doc, currentY) {
         ) {
           if (
             dataReport[data.column.index - 3][data.row.index].Evaluation ==
-              "LOW" ||
+            "LOW" ||
             dataReport[data.column.index - 3][data.row.index].Evaluation ==
-              "HIGH" ||
+            "HIGH" ||
             dataReport[data.column.index - 3][data.row.index].Evaluation ==
-              "NOT PASS" ||
+            "NOT PASS" ||
             dataReport[data.column.index - 3][data.row.index].Evaluation == "NG"
           ) {
             doc.setTextColor(231, 76, 60); // Red
@@ -869,11 +869,11 @@ async function DataSet2(dataReport, CurrentRound, doc, currentY) {
         ) {
           if (
             dataEvaluation[data.row.index * 5 + (data.column.index - 3)] ==
-              "LOW" ||
+            "LOW" ||
             dataEvaluation[data.row.index * 5 + (data.column.index - 3)] ==
-              "HIGH" ||
+            "HIGH" ||
             dataEvaluation[data.row.index * 5 + (data.column.index - 3)] ==
-              "NOT PASS" ||
+            "NOT PASS" ||
             dataEvaluation[data.row.index * 5 + (data.column.index - 3)] == "NG"
           ) {
             doc.setTextColor(231, 76, 60); // Red
@@ -906,7 +906,7 @@ async function PicSetHONDAR(dataReport, CurrentRound, doc, currentY) {
   try {
     console.log("PicSetHONDAR");
     doc.autoTable({
-      startY: currentY+2,
+      startY: currentY + 2,
       head: [
         [
           {
@@ -1216,9 +1216,9 @@ async function PicSetHONDAR(dataReport, CurrentRound, doc, currentY) {
           data.section === "body" &&
           data.column.index >= 1 &&
           (data.row.index == 0 ||
-            data.row.index == 4 ||
-            data.row.index == 8 ||
-            data.row.index == 12)
+            data.row.index == 3 ||
+            data.row.index == 6 ||
+            data.row.index == 9)
         ) {
           try {
             let bitmap = fs.readFileSync(
@@ -1505,8 +1505,8 @@ async function SignSet(dataReport, doc, currentY) {
               try {
                 let bitmap = fs.readFileSync(
                   "C:\\AutomationProject\\SAR\\asset_ts\\Sign_Pic\\" +
-                    dataInTable[3][data.column.index] +
-                    ".jpg"
+                  dataInTable[3][data.column.index] +
+                  ".jpg"
                 );
                 doc.addImage(
                   bitmap.toString("base64"),
@@ -1576,8 +1576,8 @@ async function SignSet(dataReport, doc, currentY) {
               try {
                 let bitmap = fs.readFileSync(
                   "C:\\AutomationProject\\SAR\\asset_ts\\Sign_Pic\\" +
-                    dataInTable[3][data.column.index] +
-                    ".jpg"
+                  dataInTable[3][data.column.index] +
+                  ".jpg"
                 );
                 doc.addImage(
                   bitmap.toString("base64"),

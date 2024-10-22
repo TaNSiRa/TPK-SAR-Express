@@ -6,10 +6,10 @@ const sql = require('mssql');
 
 // Configuration for SQL Server
 const config = {
-  user: 'sa',
-  password: 'Automatic',
-  database: 'SAR',
-  server: '172.23.10.51',
+  user: "sa",
+  password: "Automatic",
+  database: "SAR",
+  server: "172.23.10.51",
   options: {
     encrypt: false, // Use this if you're connecting to a local SQL Server
     enableArithAbort: true

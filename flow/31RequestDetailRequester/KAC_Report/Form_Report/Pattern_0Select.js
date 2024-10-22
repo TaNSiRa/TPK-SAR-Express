@@ -47,6 +47,8 @@ const Pattern_TMTS = require("./Pattern_TMTS.js");
 const Pattern_AAB = require("./Pattern_AAB.js");
 const Pattern_PHODAIHAN = require("./Pattern_PHODAIHAN.js");
 const Pattern_GASBP = require("./Pattern_GASBP.js");
+const Pattern_ATT = require("./Pattern_ATT.js");
+
 
 exports.SelectPattern = async (dataReport) => {
   try {
@@ -159,6 +161,8 @@ exports.SelectPattern = async (dataReport) => {
       var data = await Pattern_PHODAIHAN.CreatePDF(dataReport);
     } else if (dataReport[0].PatternReport == "GASBP") {
       var data = await Pattern_GASBP.CreatePDF(dataReport);
+    } else if (dataReport[0].PatternReport == "ATT") {
+      var data = await Pattern_ATT.CreatePDF(dataReport);
     } else {
       {
         console.log("K1");

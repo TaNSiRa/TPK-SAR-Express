@@ -255,21 +255,21 @@ exports.PicSet = async (dataReport, doc, currentY) => {
   }
 };
 
-exports.PicSetforNHK = async (dataReport, doc, currentY) => {
+exports.PicSetforATT = async (dataReport, doc, currentY) => {
   try {
     console.log("PicSet");
     var foundData = 0;
     for (let i = 0; i < dataReport.length; i++) {
-      if (dataReport[i].ReportOrder > 100 && dataReport[i].ReportOrder <= 104) {
+      if (dataReport[i].ReportOrder > 100) {
         foundData++;
       }
     }
     if (foundData > 0) {
       /* if (currentY >= 190) { */
-      if (currentY >= 170) {
-        doc.addPage();
-        currentY = 10;
-      }
+      // if (currentY >= 170) {
+      //   doc.addPage();
+      //   currentY = 10;
+      // }
       doc.autoTable({
         startY: currentY + 4,
         head: [
@@ -303,7 +303,7 @@ exports.PicSetforNHK = async (dataReport, doc, currentY) => {
     var picHeight = 55;
     var picWidht = 90;
     for (let i = 0; i < dataReport.length; i++) {
-      if (dataReport[i].ReportOrder > 100 && dataReport[i].ReportOrder <= 104) {
+      if (dataReport[i].ReportOrder > 100) {
         var dataInTable = [];
         var countSpan = 1;
         var dataBuff = [];
@@ -372,17 +372,17 @@ exports.PicSetforNHK = async (dataReport, doc, currentY) => {
         if (i >= dataReport.length) {
           i--;
         }
-        if (dataReport[i].ReportOrder == 105 + countSetPic * 10) {
-          /* if (currentY >= 190) { */
-          if (currentY >= 170) {
-            doc.addPage();
-            currentY = 10;
-          }
-          /*  } else if (currentY >= 230) { */
-        } else if (currentY >= 170) {
-          doc.addPage();
-          currentY = 10;
-        }
+        // if (dataReport[i].ReportOrder == 105 + countSetPic * 10) {
+        //   /* if (currentY >= 190) { */
+        //   if (currentY >= 170) {
+        //     doc.addPage();
+        //     currentY = 10;
+        //   }
+        //   /*  } else if (currentY >= 230) { */
+        // } else if (currentY >= 170) {
+        //   doc.addPage();
+        //   currentY = 10;
+        // }
 
         doc.autoTable({
           startY: currentY + 4,
@@ -390,19 +390,19 @@ exports.PicSetforNHK = async (dataReport, doc, currentY) => {
             [
               "MATERIAL",
               "CHECK ITEM",
-              {
-                content: "CONTROLED RANGE",
-                styles: {
-                  textColor: 0,
-                  halign: "center",
-                  valign: "middle",
-                  font: "THSarabun",
-                  fontStyle: "bold",
-                  fontSize: 11,
-                },
-              },
+              // {
+              //   content: "CONTROLED RANGE",
+              //   styles: {
+              //     textColor: 0,
+              //     halign: "center",
+              //     valign: "middle",
+              //     font: "THSarabun",
+              //     fontStyle: "bold",
+              //     fontSize: 11,
+              //   },
+              // },
               "RESULT",
-              "EVALUATION",
+              // "EVALUATION",
             ],
           ],
           headStyles: {
@@ -436,7 +436,7 @@ exports.PicSetforNHK = async (dataReport, doc, currentY) => {
           },
           columnStyles: {
             //0: {cellWidth : 20},
-            0: { fillColor: [211, 239, 240] },
+            0: { cellWidth: 35 },
             1: { cellWidth: 35 },
             2: { cellWidth: 30 },
             3: { cellWidth: 30 },
@@ -507,12 +507,12 @@ exports.PicSetforNHK = async (dataReport, doc, currentY) => {
   }
 };
 
-exports.PicSetforAAB = async (dataReport, doc, currentY) => {
+exports.PicSetforNHK = async (dataReport, doc, currentY) => {
   try {
     console.log("PicSet");
     var foundData = 0;
     for (let i = 0; i < dataReport.length; i++) {
-      if (dataReport[i].ReportOrder > 100) {
+      if (dataReport[i].ReportOrder > 100 && dataReport[i].ReportOrder <= 104) {
         foundData++;
       }
     }
@@ -527,7 +527,7 @@ exports.PicSetforAAB = async (dataReport, doc, currentY) => {
         head: [
           [
             {
-              content: "Quality of coating",
+              content: "Quality of phosphate film.",
               styles: {
                 textColor: 0,
                 halign: "center",
@@ -555,7 +555,7 @@ exports.PicSetforAAB = async (dataReport, doc, currentY) => {
     var picHeight = 55;
     var picWidht = 90;
     for (let i = 0; i < dataReport.length; i++) {
-      if (dataReport[i].ReportOrder > 100) {
+      if (dataReport[i].ReportOrder > 100 && dataReport[i].ReportOrder <= 104) {
         var dataInTable = [];
         var countSpan = 1;
         var dataBuff = [];

@@ -606,6 +606,7 @@ exports.Sem = async (dataReport, doc, currentY) => {
         1: { cellWidth: picWidth },
         2: { cellWidth: picWidth },
       },
+
       didDrawCell: function (data) {
         if (data.column.index == 1 && data.section === "body") {
           try {
@@ -613,8 +614,9 @@ exports.Sem = async (dataReport, doc, currentY) => {
             try {
               bitmap = fs.readFileSync(
                 "C:\\AutomationProject\\SAR\\asset\\" +
-                  dataReport[i + data.row.index].ResultReport
+                dataReport[i + data.row.index].ResultReport
               );
+              // console.log(dataReport[i + data.row.index].ResultReport);
             } catch (err) {
               bitmap = fs.readFileSync("C:\\SAR\\asset\\NotFoundPic.jpg");
             }
@@ -634,13 +636,27 @@ exports.Sem = async (dataReport, doc, currentY) => {
           try {
             var bitmap;
             try {
-              bitmap = fs.readFileSync(
-                "C:\\AutomationProject\\SAR\\asset\\" +
-                  dataReport[i + 1 + data.column.index].ResultReport
-              );
+              // รอบแรกจะใช้ i + data.row.index เพื่อให้ค่า index ตรงกับลำดับแถวที่ถูกต้อง
+              // รอบที่สองจะใช้ i + 1 + data.row.index เพื่อดึงรูปจาก index ที่ต่างออกไป
+              if (data.row.index % 2 == 0) {
+                // รอบแรก
+                bitmap = fs.readFileSync(
+                  "C:\\AutomationProject\\SAR\\asset\\" +
+                  dataReport[i + 2 + data.row.index].ResultReport
+                );
+                console.log(dataReport[i + 2 + data.row.index].ResultReport);
+              } else {
+                // รอบที่สอง
+                bitmap = fs.readFileSync(
+                  "C:\\AutomationProject\\SAR\\asset\\" +
+                  dataReport[i + 2 + data.row.index].ResultReport
+                );
+                console.log(dataReport[i + 2 + data.row.index].ResultReport);
+              }
             } catch (err) {
               bitmap = fs.readFileSync("C:\\SAR\\asset\\NotFoundPic.jpg");
             }
+
             doc.addImage(
               bitmap.toString("base64"),
               "jpg",
@@ -650,11 +666,11 @@ exports.Sem = async (dataReport, doc, currentY) => {
               picHeight - 2
             );
           } catch (err) {
-            console.log("error pic" + err);
+            console.log("error pic: " + err);
           }
         }
-      },
 
+      },
       theme: "grid",
     });
 

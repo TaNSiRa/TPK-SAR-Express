@@ -1222,6 +1222,7 @@ async function SetGraph(dataReport, doc, indexGraph, xPosition) {
     var countGraph = 0;
     var picGraph = [];
     var dataBody = [];
+
     //prepare pic
     for (let i = 0; i < indexGraph.length; i++) {
       picGraph.push(await GraphPic(dataReport, indexGraph[i]));
@@ -1744,6 +1745,7 @@ async function GraphPic(dataReport, indexData) {
       buffUpper.push(dataReport[i][indexData].StdMax);
       buffLower.push(dataReport[i][indexData].StdMin);
       bufData.push(dataReport[i][indexData].ResultReport);
+      console.log(bufData);
     }
     let StdMin = dataReport[0][indexData].StdMax;
     let StdMax = dataReport[0][indexData].StdMin;
