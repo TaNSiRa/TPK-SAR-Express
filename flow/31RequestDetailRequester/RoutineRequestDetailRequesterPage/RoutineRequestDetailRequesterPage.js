@@ -118,6 +118,54 @@ router.post(
 );
 
 router.post(
+  "/RoutineRequestDetailRequesterPage_sentReportToCustomer",
+  async (req, res) => {
+    console.log("in sentReportToCustomer");
+    try {
+      var dataIn = JSON.parse(req.body.sentReportData);
+      var dt = dtget.DateTimeNow();
+      var query = `update [Routine_RequestLab] set SentRep = '${dt}', SentRepStatus = 'SENT COMPLETE'
+      where reqNo = '${dataIn[0].ReqNo}';`;
+
+      console.log(query);
+      await mssql.qurey(query);
+
+
+
+      res.send("OK");
+    } catch (error) {
+      console.log(error);
+      res.status(400);
+      res.json("ERROR");
+    }
+  }
+);
+
+router.post(
+  "/RoutineRequestDetailRequesterPage_cancelsentReportToCustomer",
+  async (req, res) => {
+    console.log("in cancelsentReportToCustomer");
+    try {
+      var dataIn = JSON.parse(req.body.cancelReportData);
+      var dt = dtget.DateTimeNow();
+      var query = `update [Routine_RequestLab] set SentRep = '', SentRepStatus = ''
+      where reqNo = '${dataIn[0].ReqNo}';`;
+
+      console.log(query);
+      await mssql.qurey(query);
+
+
+
+      res.send("OK");
+    } catch (error) {
+      console.log(error);
+      res.status(400);
+      res.json("ERROR");
+    }
+  }
+);
+
+router.post(
   "/RoutineRequestDetailRequesterPage_saveRejectReport",
   async (req, res) => {
     console.log("in ssaveRejectReport");

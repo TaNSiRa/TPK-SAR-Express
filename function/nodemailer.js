@@ -32,7 +32,7 @@ exports.MKTSendCompleteReport = async (ReqNo, Incharge, Subject, Text) => {
       to: data[0].email, // list of receivers
       subject: Subject, // Subject line
       html: ` <p>${Text}</p>
-      <a href="http://172.23.10.51:1880" target="_blank">SAR PROGRAM</a>`, // html body
+      <a href="http://127.0.0.1:1880" target="_blank">SAR PROGRAM</a>`, // html body
       attachments: [
         // File Stream attachment
         {
@@ -70,7 +70,7 @@ exports.MKTSendRejectReport = async (MailTo, Subject, Text) => {
       to: emailSend, // list of receivers
       subject: Subject, // Subject line
       html: ` <p>${Text}</p>
-      <a href="http://172.23.10.51:1880" target="_blank">SAR PROGRAM</a>`, // html body
+      <a href="http://127.0.0.1:1880" target="_blank">SAR PROGRAM</a>`, // html body
     });
 
     console.log("ok");
@@ -96,7 +96,7 @@ exports.test_send = async () => {
       to: "arsa@thaiparker.co.th", // list of receivers
       subject: "Hello", // Subject line
       text: "Hello world?", // plain text body
-      html: `<a href="http://172.23.10.51:5500" target="_blank">SAR PROGRAM</a>`, // html body
+      html: `<a href="http://127.0.0.1:5500" target="_blank">SAR PROGRAM</a>`, // html body
       attachments: [
         // String attachment
         {

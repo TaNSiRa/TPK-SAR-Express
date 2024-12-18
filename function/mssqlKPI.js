@@ -1,8 +1,8 @@
-const mssql = require('mssql');
+const mssqlKPI = require('mssql');
 const config = {
   user: "sa",
   password: "12345678",
-  database: "SAR",
+  database: "SARKPI",
   server: "127.0.0.1",
   pool: {
     //max: 10,
@@ -29,15 +29,15 @@ const config = {
 exports.qurey = async (QueryText) => {
   try {
     console.log(`---------------`);
-    await mssql.connect(config)
-    const result = await mssql.query(QueryText).then((v) => {
+    await mssqlKPI.connect(config)
+    const result = await mssqlKPI.query(QueryText).then((v) => {
       // console.log(`---------------`);
       //console.log(v.recordset);  
       out = v;
       // console.log(`---------------`);
       return v;
 
-    }).then(() => mssql.close())
+    }).then(() => mssqlKPI.close())
 
     //  console.dir(result)
     return out;
