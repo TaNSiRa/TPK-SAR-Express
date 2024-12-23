@@ -1,7 +1,7 @@
 const createpdf = require("../KAC_Report/Form_Report/Pattern_0Select.js");
 const mssql = require("../../../function/mssql.js");
-const masterDoc = require("C:/Users/auto/Desktop/Express/flow/31RequestDetailRequester/KAC_Report/Form_Report/PatternComponent/Pattern_5MasterDoc.js");
-const masterDocYearly = require("C:/Users/auto/Desktop/Express/flow/31RequestDetailRequester/KAC_Report/Form_Report/PatternComponent/Pattern_1MainHeadSetYear.js");
+const masterDoc = require("../KAC_Report/Form_Report/PatternComponent/Pattern_5MasterDoc.js");
+const masterDocYearly = require("../KAC_Report/Form_Report/PatternComponent/Pattern_1MainHeadSetYear.js");
 exports.CreateReport = async (reqNo) => {
   console.log("in CreateReport");
   console.log("CreateReportreqNo: " + reqNo); // Debugging
