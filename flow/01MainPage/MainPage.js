@@ -46,6 +46,7 @@ router.post(
     console.log("in DeleteStageReason");
     try {
       var dataIn = JSON.parse(req.body.DeleteKPIreason);
+      console.log(req.body);
       var reqNo = dataIn[0].ReqNo;
       var reason = '';
       var stage = '';
