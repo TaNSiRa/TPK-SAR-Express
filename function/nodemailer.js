@@ -70,7 +70,7 @@ exports.MKTSendRejectReport = async (MailTo, Subject, Text) => {
       to: emailSend, // list of receivers
       subject: Subject, // Subject line
       html: ` <p>${Text}</p>
-      <a href="http://172.23.10.51:1880" target="_blank">SAR PROGRAM</a>`, // html body
+      <a href="http://172.23.10.51:5500" target="_blank">SAR PROGRAM</a>`, // html body
     });
 
     console.log("ok");
