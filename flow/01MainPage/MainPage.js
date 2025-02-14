@@ -13,7 +13,7 @@ router.post(
       var stage = dataIn[0].Stage;
 
       var query = `
-        UPDATE [KPI_Overdue]
+        UPDATE [KPI_Service]
         SET 
           Reason1 = CASE WHEN ReqNo1 = '${reqNo}' THEN '${reason}' ELSE Reason1 END,
           Reason2 = CASE WHEN ReqNo2 = '${reqNo}' THEN '${reason}' ELSE Reason2 END,
@@ -52,7 +52,7 @@ router.post(
       var stage = '';
 
       var query = `
-        UPDATE [KPI_Overdue]
+        UPDATE [KPI_Service]
         SET 
           Reason1 = CASE WHEN ReqNo1 = '${reqNo}' THEN '${reason}' ELSE Reason1 END,
           Reason2 = CASE WHEN ReqNo2 = '${reqNo}' THEN '${reason}' ELSE Reason2 END,
