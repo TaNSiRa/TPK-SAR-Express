@@ -150,7 +150,7 @@ async function SetGraph(dataReport, doc, indexGraph, xPosition) {
       head: [
         [
           {
-            content: "Coating weight control chart",
+            content: "Control chart",
             styles: {
               textColor: 0,
               halign: "center",
