@@ -527,7 +527,7 @@ exports.PicSetforATT = async (dataReport, doc, currentY) => {
         head: [
           [
             {
-              content: "Quality of phosphate film.",
+              content: "Quality of PULS film",
               styles: {
                 textColor: 0,
                 halign: "center",
