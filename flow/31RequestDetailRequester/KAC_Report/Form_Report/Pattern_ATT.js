@@ -391,7 +391,7 @@ async function SetGraph1(dataReport, doc, indexGraph, xPosition) {
       head: [
         [
           {
-            content: "Coating weight control chart",
+            content: "Control chart",
             styles: {
               textColor: 0,
               halign: "center",
@@ -632,7 +632,7 @@ async function SetGraph2(dataReport, doc, indexGraph, xPosition) {
       head: [
         [
           {
-            content: "Coating weight control chart",
+            content: "Control chart",
             styles: {
               textColor: 0,
               halign: "center",
@@ -873,7 +873,7 @@ async function SetGraph3(dataReport, doc, indexGraph, xPosition) {
       head: [
         [
           {
-            content: "Coating weight control chart",
+            content: "Control chart",
             styles: {
               textColor: 0,
               halign: "center",
