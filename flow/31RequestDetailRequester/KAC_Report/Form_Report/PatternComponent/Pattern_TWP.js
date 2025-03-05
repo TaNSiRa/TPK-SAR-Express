@@ -548,9 +548,9 @@ exports.Sem = async (dataReport, doc, currentY) => {
         },
       },
     ]);
-    if (dataReport[i + 2].ResultReport != "N/A") {
+    if (dataReport[i + 1].ResultReport != "N/A") {
       dataInTable.push([
-        dataReport[i + 2].ProcessReportName,
+        dataReport[i + 1].ProcessReportName,
         {
           content: "",
           styles: {
