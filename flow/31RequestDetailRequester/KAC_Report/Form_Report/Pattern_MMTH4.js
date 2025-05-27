@@ -772,7 +772,8 @@ async function PicSet(dataReport, doc, currentY) {
     ]);
     dataInTable.push([
       dataReport[startIndex + 12].ItemReportName,
-      dataReport[startIndex + 12].ControlRange,
+      // dataReport[startIndex + 12].ControlRange,
+      "-",
       dataReport[startIndex + 12].ResultReport,
       dataReport[startIndex + 13].ResultReport,
       dataReport[startIndex + 14].ResultReport,
