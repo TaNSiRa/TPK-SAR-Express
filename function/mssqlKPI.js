@@ -1,9 +1,9 @@
 const mssqlKPI = require('mssql');
 const config = {
   user: "sa",
-  password: "Automatic",
+  password: "12345678",
   database: "SARKPI",
-  server: "172.23.10.51",
+  server: "127.0.0.1",
   pool: {
     //max: 10,
     //min: 0,

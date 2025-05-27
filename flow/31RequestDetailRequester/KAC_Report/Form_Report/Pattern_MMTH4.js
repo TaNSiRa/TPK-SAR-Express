@@ -691,7 +691,8 @@ async function PicSet(dataReport, doc, currentY) {
         ),
       },
       dataReport[startIndex].ItemReportName,
-      dataReport[startIndex].ControlRange,
+      // dataReport[startIndex].ControlRange,
+      "-",
       {
         content: "",
         styles: {
