@@ -185,7 +185,7 @@ router.post("/KACReportData_saveKACReportData", async (req, res) => {
       ,'${data[i].StdMax}'
       ,'${data[i].StdSymbol}'
       ,'${data[i].StdMin}'
-      ,'${data[i].ControlRange}'
+      ,N'${data[i].ControlRange}'
       ,'${data[i].ResultIn}'
       ,'${data[i].ResultReport}'
       ,'${data[i].Evaluation}'
@@ -312,7 +312,7 @@ router.post("/KACReportData_createKACReport", async (req, res) => {
       ,'${data[i].StdMax}'
       ,'${data[i].StdSymbol}'
       ,'${data[i].StdMin}'
-      ,'${data[i].ControlRange}'
+      ,N'${data[i].ControlRange}'
       ,'${data[i].ResultIn}'
       ,'${data[i].ResultReport}'
       ,'${data[i].Evaluation}'
@@ -417,13 +417,13 @@ router.post("/KACReportData_reviseKACReport", async (req, res) => {
       const sizeInBytes = stringLength * (3 / 4) - 2;
       const sizeInKb = sizeInBytes / 1000;
       console.log(sizeInKb);
-    
+
       if (sizeInKb < 10000) {
         break;
       }
     }
 
-    
+
 
     res.send(report);
   } catch (error) {
