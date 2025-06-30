@@ -24,6 +24,7 @@ const Pattern_UCC = require("./Pattern_UCC.js");
 const Pattern_Y2TM = require("./Pattern_Y2TM.js");
 const Pattern_BCM = require("./Pattern_BCM.js");
 const Pattern_TBFST = require("./Pattern_TBFST.js");
+const Pattern_TBFST2 = require("./Pattern_TBFST2.js");
 const Pattern_TYK = require("./Pattern_TYK.js");
 const Pattern_TSMI = require("./Pattern_TSMI.js");
 const Pattern_SFTB = require("./Pattern_SFTB.js");
@@ -50,7 +51,6 @@ const Pattern_GASBP = require("./Pattern_GASBP.js");
 const Pattern_ATT = require("./Pattern_ATT.js");
 const Pattern_THACOM = require("./Pattern_THACOM.js");
 const Pattern_DAIKINAC131 = require("./Pattern_DAIKINAC131.js");
-
 
 exports.SelectPattern = async (dataReport) => {
   try {
@@ -113,6 +113,8 @@ exports.SelectPattern = async (dataReport) => {
       var data = await Pattern_BCM.CreatePDF(dataReport);
     } else if (dataReport[0].PatternReport == "TBFST") {
       var data = await Pattern_TBFST.CreatePDF(dataReport);
+    } else if (dataReport[0].PatternReport == "TBFST2") {
+      var data = await Pattern_TBFST2.CreatePDF(dataReport);
     } else if (dataReport[0].PatternReport == "TYK") {
       var data = await Pattern_TYK.CreatePDF(dataReport);
     } else if (dataReport[0].PatternReport == "TSMI") {

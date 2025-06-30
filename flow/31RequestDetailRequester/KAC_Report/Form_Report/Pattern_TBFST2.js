@@ -13,7 +13,7 @@ exports.CreatePDF = async (dataReport) => {
     var pageHeight = doc.internal.pageSize.height;
     var pageWidth = doc.internal.pageSize.width;
     var currentY = 0;
-    console.log("In TBFST");
+
     doc.setFont("THSarabun");
     console.log("2");
     var buffDoc;
@@ -42,7 +42,6 @@ exports.CreatePDF = async (dataReport) => {
     //Document Code
     doc = await Pattern_Doc.MasterWeeklyDocument(doc);
 
-    console.log("before SavePDF");
 
     await doc.save(
       "C:\\AutomationProject\\SAR\\asset_ts\\Report\\KAC\\" +
@@ -105,17 +104,14 @@ async function DataSetTBFST(dataReport, doc, currentY) {
       "Case washing No.1",
       "Case washing No.2",
       "Case washing No.3",
-      "Case washing No.4",
       "Plate washing No.1",
       "Plate washing No.2",
-      "Plate washing No.3",
       "Plate washing No.4",
     ];
-
-    var MachineSpans = [5, 5, 5, 5, 10, 10, 10, 10];
+    var MachineSpans = [5, 5, 5, 10, 10, 10];
     for (let i = 0; i < dataReport.length; i++) {
-      if (i <= 19) {
-        if (i == 0 || i == 5 || i == 10 || i == 15) {
+      if (i <= 14) {
+        if (i == 0 || i == 5 || i == 10) {
           dataInTable.push([
             {
               rowSpan: MachineSpans[countIndexSpans],
@@ -131,7 +127,7 @@ async function DataSetTBFST(dataReport, doc, currentY) {
             dataReport[i].Evaluation,
           ]);
           countIndexSpans++;
-        } else if (i == 3 || i == 8 || i == 13 || i == 18) {
+        } else if (i == 3 || i == 8 || i == 13) {
           dataInTable.push([
             { rowSpan: 2, content: dataReport[i].ItemReportName },
             dataReport[i].ControlRange,
@@ -153,7 +149,7 @@ async function DataSetTBFST(dataReport, doc, currentY) {
           ]);
         }
       } else {
-        if (i == 20 || i == 30 || i == 40 || i == 50) {
+        if (i == 15 || i == 25 || i == 35) {
           dataInTable.push([
             {
               rowSpan: MachineSpans[countIndexSpans],
@@ -169,7 +165,7 @@ async function DataSetTBFST(dataReport, doc, currentY) {
             dataReport[i].Evaluation,
           ]);
           countIndexSpans++;
-        } else if (i == 25 || i == 35 || i == 45 || i == 55) {
+        } else if (i == 20 || i == 30 || i == 40) {
           dataInTable.push([
             {
               rowSpan: 5,
@@ -181,13 +177,12 @@ async function DataSetTBFST(dataReport, doc, currentY) {
             dataReport[i].Evaluation,
           ]);
         } else if (
+          i == 18 ||
           i == 23 ||
           i == 28 ||
           i == 33 ||
           i == 38 ||
-          i == 43 ||
-          i == 48 ||
-          i == 53
+          i == 43
         ) {
           dataInTable.push([
             { rowSpan: 2, content: dataReport[i].ItemReportName },
