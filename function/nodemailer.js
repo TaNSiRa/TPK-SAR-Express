@@ -2,17 +2,27 @@ const nodemailer = require("nodemailer");
 const mssql = require("../function/mssql.js");
 
 let serverMail = nodemailer.createTransport({
-  host: "172.20.10.69",
-  port: 25,
-  secure: false, // true for 465, false for other ports
-  /*      auth: {
-    user: "arsa@thaiparker.co.th", // generated ethereal user
-    pass: "P@ssW0rd0", // generated ethereal password
-  },   */
-  tls: {
-    // do not fail on invalid certs
-    rejectUnauthorized: false,
+  // host: "172.20.10.69",
+  // port: 25,
+  // secure: false, // true for 465, false for other ports
+  // /*      auth: {
+  //   user: "arsa@thaiparker.co.th", // generated ethereal user
+  //   pass: "P@ssW0rd0", // generated ethereal password
+  // },   */
+  // tls: {
+  //   // do not fail on invalid certs
+  //   rejectUnauthorized: false,
+  // },
+  host: 'smtp.office365.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: 'es1_auto@thaiparker.co.th',
+    pass: 'Password2025'
   },
+  tls: {
+    ciphers: 'SSLv3'
+  }
 });
 
 exports.MKTSendCompleteReport = async (ReqNo, Incharge, Subject, Text) => {
@@ -28,11 +38,24 @@ exports.MKTSendCompleteReport = async (ReqNo, Incharge, Subject, Text) => {
     data = data.recordset;
 
     await serverMail.sendMail({
-      from: "SAR-SYSTEM@thaiparker.co.th", // sender address
+      // from: "SAR-SYSTEM@thaiparker.co.th", // sender address
+      // to: data[0].email, // list of receivers
+      // subject: Subject, // Subject line
+      // html: ` <p>${Text}</p>
+      // <a href="http://172.23.10.51:1880" target="_blank">SAR PROGRAM</a>`, // html body
+      // attachments: [
+      //   // File Stream attachment
+      //   {
+      //     filename: ReqNo + ".pdf",
+      //     path: `C://AutomationProject//SAR//asset_ts//Report//KAC//${ReqNo}.pdf`,
+      //     //cid: "nyan@example.com", // should be as unique as possible
+      //   },
+      // ],
+      // from: "SAR-SYSTEM@thaiparker.co.th", // sender address
       to: data[0].email, // list of receivers
       subject: Subject, // Subject line
       html: ` <p>${Text}</p>
-      <a href="http://172.23.10.51:1880" target="_blank">SAR PROGRAM</a>`, // html body
+      <a href="http://172.23.10.51:5500" target="_blank">SAR PROGRAM</a>`, // html body
       attachments: [
         // File Stream attachment
         {
@@ -66,7 +89,11 @@ exports.MKTSendRejectReport = async (MailTo, Subject, Text) => {
 
 
     await serverMail.sendMail({
-      from: "SAR-SYSTEM@thaiparker.co.th", // sender address
+      // from: "SAR-SYSTEM@thaiparker.co.th", // sender address
+      // to: emailSend, // list of receivers
+      // subject: Subject, // Subject line
+      // html: ` <p>${Text}</p>
+      // <a href="http://172.23.10.51:5500" target="_blank">SAR PROGRAM</a>`, // html body
       to: emailSend, // list of receivers
       subject: Subject, // Subject line
       html: ` <p>${Text}</p>
