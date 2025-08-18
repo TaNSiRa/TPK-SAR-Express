@@ -22,7 +22,7 @@ let serverMail = nodemailer.createTransport({
     pass: process.env.mail365_pass
   },
   tls: {
-    ciphers: 'SSLv3'
+    rejectUnauthorized: false,
   }
 });
 
@@ -35,11 +35,11 @@ exports.MKTSendCompleteReport = async (ReqNo, Incharge, Subject, Text) => {
   try {
     var query = `select email from [Master_User]  where Name = '${Incharge}'`;
     var data = await mssql.qurey(query);
-    //console.log(data);
+    // console.log(data);
     data = data.recordset;
 
     await serverMail.sendMail({
-      // from: "SAR-SYSTEM@thaiparker.co.th", // sender address
+      from: "es1_auto@thaiparker.co.th", // sender address
       // to: data[0].email, // list of receivers
       // subject: Subject, // Subject line
       // html: ` <p>${Text}</p>
