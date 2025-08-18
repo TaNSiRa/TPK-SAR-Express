@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const mssql = require("../function/mssql.js");
+require('dotenv').config();
 
 let serverMail = nodemailer.createTransport({
   // host: "172.20.10.69",
@@ -17,8 +18,8 @@ let serverMail = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: 'es1_auto@thaiparker.co.th',
-    pass: 'Password2025'
+    user: process.env.mail365_user,
+    pass: process.env.mail365_pass
   },
   tls: {
     ciphers: 'SSLv3'
