@@ -54,7 +54,7 @@ exports.CreatePDF = async (dataReport) => {
     } */
     var currentRound = dataBuffSet.length;
 
-    var doc = new jsPDF("l", "mm", "a3", true); // defualt unit mm.
+    var doc = new jsPDF("l", "mm", [420, 297], true); // defualt unit mm.
     var pageHeight = doc.internal.pageSize.height;
     var pageWidth = doc.internal.pageSize.width;
     //console.log(pageHeight, pageWidth);
@@ -95,7 +95,7 @@ exports.CreatePDF = async (dataReport) => {
     //Document Code
     doc = await Pattern_Doc.MasterWeeklyDocument1(doc);
 
-    doc.addPage("l", "mm", "a3", true);
+    doc.addPage("l", "mm", [420, 297], true);
     currentY = 10;
 
     //Set Graph Degreasing
