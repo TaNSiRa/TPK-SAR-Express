@@ -391,7 +391,7 @@ exports.DataSetTH = async (dataReport, doc, currentY) => {
 
 exports.DataSetTHFFS = async (dataReport, doc, currentY) => {
   try {
-    console.log("DataSet");
+    console.log("DataSetTHFFS");
 
     for (let i = 0; i < dataReport.length; i++) {
       if (dataReport[i].Evaluation == "LOW") {
