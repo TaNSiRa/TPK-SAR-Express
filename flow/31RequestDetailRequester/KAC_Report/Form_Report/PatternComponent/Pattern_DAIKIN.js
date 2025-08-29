@@ -301,7 +301,19 @@ exports.DataSetTH = async (dataReport, doc, currentY) => {
         }
       } else if (countRound == 4) {
         if (dataReport[0].Comment5 != "" && dataReport[0].Comment5 != null) {
-          dataInTable.push([dataReport[0].Comment5]);
+          dataInTable.push([dataReport[0].Comment5.split('|')[0]]);
+        }
+      } else if (countRound == 5) {
+        if (dataReport[0].Comment5 != "" && dataReport[0].Comment5 != null) {
+          dataInTable.push([dataReport[0].Comment5.split('|')[1]]);
+        }
+      } else if (countRound == 6) {
+        if (dataReport[0].Comment5 != "" && dataReport[0].Comment5 != null) {
+          dataInTable.push([dataReport[0].Comment5.split('|')[2]]);
+        }
+      } else if (countRound == 7) {
+        if (dataReport[0].Comment5 != "" && dataReport[0].Comment5 != null) {
+          dataInTable.push([dataReport[0].Comment5.split('|')[3]]);
         }
       }
 
