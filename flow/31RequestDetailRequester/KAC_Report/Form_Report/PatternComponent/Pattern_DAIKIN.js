@@ -646,7 +646,31 @@ exports.DataSetTHFFS = async (dataReport, doc, currentY) => {
           }
         } else if (countRound == 4) {
           if (dataReport[0].Comment5 != "" && dataReport[0].Comment5 != null) {
-            dataInTable.push([dataReport[0].Comment5]);
+            console.log("Comment5");
+            console.log(dataReport[0].Comment5);
+            console.log(dataReport[0].Comment5.split('|')[0]);
+            dataInTable.push([[dataReport[0].Comment5].split('|')[0]]);
+          }
+        } else if (countRound == 5) {
+          if (dataReport[0].Comment5 != "" && dataReport[0].Comment5 != null) {
+            console.log("Comment6");
+            console.log(dataReport[0].Comment5);
+            console.log(dataReport[0].Comment5.split('|')[1]);
+            dataInTable.push([[dataReport[0].Comment5].split('|')[0]]);
+          }
+        } else if (countRound == 6) {
+          if (dataReport[0].Comment5 != "" && dataReport[0].Comment5 != null) {
+            console.log("Comment7");
+            console.log(dataReport[0].Comment5);
+            console.log(dataReport[0].Comment5.split('|')[2]);
+            dataInTable.push([[dataReport[0].Comment5].split('|')[0]]);
+          }
+        } else if (countRound == 7) {
+          if (dataReport[0].Comment5 != "" && dataReport[0].Comment5 != null) {
+            console.log("Comment8");
+            console.log(dataReport[0].Comment5);
+            console.log(dataReport[0].Comment5.split('|')[3]);
+            dataInTable.push([[dataReport[0].Comment5].split('|')[0]]);
           }
         }
 
