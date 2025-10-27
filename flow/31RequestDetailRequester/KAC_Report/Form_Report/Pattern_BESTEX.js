@@ -43,49 +43,63 @@ exports.CreatePDF = async (dataReport) => {
       dataBuffSet[j].push(dataBuff[i]);
     }
     var currentRound = dataBuffSet.length;
+    console.log(dataBuffSet);
+    //add missing data Mn ,Ni ,T-Cr
+    if (currentRound > 1) {
+      for (let j = 1; j < currentRound; j++) {
+        // ✅ ตรวจว่ามี ReportOrder = 17 หรือไม่
+        const hasReportOrder17 = dataBuffSet[j].some(item => item.ReportOrder === 17);
 
-    //add missing data Mn ,Ni ,T-Cr
-    if (currentRound > 1) {
-      for (var j = 1; j < currentRound; j++) {
-        dataBuffSet[j].splice(
-          17,
-          0,
-          {
-            SamplingDate: "-",
-            ProcessReportName: "-",
-            ItemReportName: "-",
-            ControlRange: "-",
-            ResultReport: "-",
-            Evaluation: "-",
-          },
-          {
-            SamplingDate: "-",
-            ProcessReportName: "-",
-            ItemReportName: "-",
-            ControlRange: "-",
-            ResultReport: "-",
-            Evaluation: "-",
-          }
-        );
+        if (!hasReportOrder17) {
+          dataBuffSet[j].splice(
+            17,
+            0,
+            {
+              ReportOrder: 17,
+              SamplingDate: "-",
+              ProcessReportName: "-",
+              ItemReportName: "-",
+              ControlRange: "-",
+              ResultReport: "-",
+              Evaluation: "-",
+            },
+            {
+              SamplingDate: "-",
+              ProcessReportName: "-",
+              ItemReportName: "-",
+              ControlRange: "-",
+              ResultReport: "-",
+              Evaluation: "-",
+            }
+          );
+        }
       }
     }
-    //add missing data Mn ,Ni ,T-Cr
+
+    // add missing data Mn ,Ni ,T-Cr
     if (currentRound > 1) {
-      for (var j = 1; j < currentRound; j++) {
-        dataBuffSet[j].splice(
-          20,
-          0,
-          {
-            SamplingDate: "-",
-            ProcessReportName: "-",
-            ItemReportName: "-",
-            ControlRange: "-",
-            ResultReport: "-",
-            Evaluation: "-",
-          }
-        );
+      for (let j = 1; j < currentRound; j++) {
+        // ✅ ตรวจว่ามี ReportOrder = 20 หรือไม่
+        const hasReportOrder20 = dataBuffSet[j].some(item => item.ReportOrder === 20);
+
+        if (!hasReportOrder20) {
+          dataBuffSet[j].splice(
+            20,
+            0,
+            {
+              ReportOrder: 20,
+              SamplingDate: "-",
+              ProcessReportName: "-",
+              ItemReportName: "-",
+              ControlRange: "-",
+              ResultReport: "-",
+              Evaluation: "-",
+            }
+          );
+        }
       }
     }
+
 
     //add blank week data
     for (var i = currentRound; i < 4; i++) {
