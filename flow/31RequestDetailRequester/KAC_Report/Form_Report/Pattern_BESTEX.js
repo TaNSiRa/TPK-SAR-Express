@@ -48,14 +48,14 @@ exports.CreatePDF = async (dataReport) => {
     if (currentRound > 1) {
       for (let j = 1; j < currentRound; j++) {
         // ✅ ตรวจว่ามี ReportOrder = 17 หรือไม่
-        const hasReportOrder17 = dataBuffSet[j].some(item => item.ReportOrder === 17);
+        const hasReportOrder17 = dataBuffSet[j].some(item => item.ReportOrder === 18);
 
         if (!hasReportOrder17) {
           dataBuffSet[j].splice(
             17,
             0,
             {
-              ReportOrder: 17,
+              ReportOrder: 18,
               SamplingDate: "-",
               ProcessReportName: "-",
               ItemReportName: "-",
@@ -80,14 +80,14 @@ exports.CreatePDF = async (dataReport) => {
     if (currentRound > 1) {
       for (let j = 1; j < currentRound; j++) {
         // ✅ ตรวจว่ามี ReportOrder = 20 หรือไม่
-        const hasReportOrder20 = dataBuffSet[j].some(item => item.ReportOrder === 20);
+        const hasReportOrder20 = dataBuffSet[j].some(item => item.ReportOrder === 21);
 
         if (!hasReportOrder20) {
           dataBuffSet[j].splice(
             20,
             0,
             {
-              ReportOrder: 20,
+              ReportOrder: 21,
               SamplingDate: "-",
               ProcessReportName: "-",
               ItemReportName: "-",
