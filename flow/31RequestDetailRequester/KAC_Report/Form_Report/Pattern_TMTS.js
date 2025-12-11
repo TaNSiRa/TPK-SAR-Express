@@ -90,7 +90,7 @@ exports.CreatePDF = async (dataReport) => {
     doc = buffDoc[0];
     currentY = buffDoc[1];
     doc.addPage();
-
+    // console.log(dataBuffSet);
     //Set Graph SPCC
     buffDoc = await SetGraph(dataBuffSet, doc, [22], 10);
     doc = buffDoc[0];
@@ -135,6 +135,9 @@ exports.CreatePDF = async (dataReport) => {
   }
 };
 async function SetGraph(dataReport, doc, indexGraph, xPosition) {
+  console.log(dataReport);
+  console.log('----------------------------');
+  console.log(indexGraph);
   try {
     doc.autoTable({
       startY: 15,
@@ -198,13 +201,15 @@ async function SetGraph(dataReport, doc, indexGraph, xPosition) {
         ]
       );
     }
-
+    // console.log(dataReport[dataReport.length - 1][indexGraph[0]]);
+    // console.log(dataReport[dataReport.length - 1][indexGraph[0]]);
+    // console.log(dataReport[dataReport.length - 1][indexGraph[0]].ProcessReportName);
     doc.autoTable({
       startY: 30, // ตำแหน่ง Y เริ่มต้นของตาราง
       head: [
         [
           {
-            content: dataReport[0][indexGraph[0]].ProcessReportName,
+            content: dataReport[dataReport.length - 1][indexGraph[0]].ProcessReportName,
             styles: {
               textColor: 0,
               halign: "center",
@@ -307,7 +312,7 @@ async function GraphPic(dataReport, indexData) {
         buffUpper.push(StdMax); // ค่าคงที่สำหรับเส้น Max
         buffLower.push(StdMin); // ค่าคงที่สำหรับเส้น Min
         bufData.push(dataReport[i][indexData].ResultReport);
-        console.log('bufdata : ' + bufData); // ตรวจสอบค่าที่เพิ่มเข้าไปใน bufData
+        // console.log('bufdata : ' + bufData); // ตรวจสอบค่าที่เพิ่มเข้าไปใน bufData
       }
       else {
         indexData = 26;
@@ -444,9 +449,9 @@ async function SetGraph1(dataReport, doc, indexGraph, xPosition) {
         [
           {
             content:
-              dataReport[0][indexGraph[i]].ItemReportName +
+              dataReport[dataReport.length - 1][indexGraph[i]].ItemReportName +
               " (" +
-              dataReport[0][indexGraph[i]].ControlRange +
+              dataReport[dataReport.length - 1][indexGraph[i]].ControlRange +
               ")",
           },
         ],
@@ -468,7 +473,7 @@ async function SetGraph1(dataReport, doc, indexGraph, xPosition) {
       head: [
         [
           {
-            content: dataReport[0][indexGraph[0]].ProcessReportName,
+            content: dataReport[dataReport.length - 1][indexGraph[0]].ProcessReportName,
             styles: {
               textColor: 0,
               halign: "center",
@@ -571,7 +576,7 @@ async function GraphPic1(dataReport, indexData) {
         buffUpper.push(StdMax); // ค่าคงที่สำหรับเส้น Max
         buffLower.push(StdMin); // ค่าคงที่สำหรับเส้น Min
         bufData.push(dataReport[i][indexData].ResultReport);
-        console.log('bufdata : ' + bufData); // ตรวจสอบค่าที่เพิ่มเข้าไปใน bufData
+        // console.log('bufdata : ' + bufData); // ตรวจสอบค่าที่เพิ่มเข้าไปใน bufData
       }
       else {
         indexData = 31;
