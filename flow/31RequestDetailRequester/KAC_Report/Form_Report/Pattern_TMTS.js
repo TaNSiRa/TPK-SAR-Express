@@ -183,9 +183,9 @@ async function SetGraph(dataReport, doc, indexGraph, xPosition) {
         [
           {
             content:
-              dataReport[0][indexGraph[i]].ItemReportName +
+              dataReport[dataReport.length - 1][indexGraph[i]].ItemReportName +
               " (" +
-              dataReport[0][indexGraph[i]].ControlRange +
+              dataReport[dataReport.length - 1][indexGraph[i]].ControlRange +
               ")",
           },
         ],
