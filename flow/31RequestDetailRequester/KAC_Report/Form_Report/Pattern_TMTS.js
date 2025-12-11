@@ -135,9 +135,9 @@ exports.CreatePDF = async (dataReport) => {
   }
 };
 async function SetGraph(dataReport, doc, indexGraph, xPosition) {
-  console.log(dataReport);
-  console.log('----------------------------');
-  console.log(indexGraph);
+  // console.log(dataReport);
+  // console.log('----------------------------');
+  // console.log(indexGraph);
   try {
     doc.autoTable({
       startY: 15,
@@ -175,7 +175,11 @@ async function SetGraph(dataReport, doc, indexGraph, xPosition) {
     var dataBody = []; // อาร์เรย์เก็บข้อมูลที่จะใช้ในตาราง
     var pageWidth = doc.internal.pageSize.getWidth(); // ความกว้างของหน้า PDF
     xPosition = (pageWidth - picWidth) / 2; // คำนวณตำแหน่ง x ให้อยู่กลางหน้า
-
+    let indexData = indexGraph;
+    if (dataReport[dataReport.length - 1][indexGraph[0]].ItemReportName !== 'SPGA (TP)' &&
+      dataReport[dataReport.length - 1][indexGraph[0]].ItemReportName !== 'Coating weight (g/m2)') {
+      indexData = 26;
+    }
     // เตรียมภาพ
     for (let i = 0; i < indexGraph.length; i++) {
       picGraph.push(await GraphPic(dataReport, indexGraph[i])); // สร้างภาพกราฟ
@@ -183,9 +187,9 @@ async function SetGraph(dataReport, doc, indexGraph, xPosition) {
         [
           {
             content:
-              dataReport[dataReport.length - 1][indexGraph[i]].ItemReportName +
+              dataReport[dataReport.length - 1][indexData].ItemReportName +
               " (" +
-              dataReport[dataReport.length - 1][indexGraph[i]].ControlRange +
+              dataReport[dataReport.length - 1][indexData].ControlRange +
               ")",
           },
         ],
@@ -209,7 +213,7 @@ async function SetGraph(dataReport, doc, indexGraph, xPosition) {
       head: [
         [
           {
-            content: dataReport[dataReport.length - 1][indexGraph[0]].ProcessReportName,
+            content: dataReport[dataReport.length - 1][indexData].ProcessReportName,
             styles: {
               textColor: 0,
               halign: "center",
@@ -441,7 +445,11 @@ async function SetGraph1(dataReport, doc, indexGraph, xPosition) {
     var dataBody = []; // อาร์เรย์เก็บข้อมูลที่จะใช้ในตาราง
     var pageWidth = doc.internal.pageSize.getWidth(); // ความกว้างของหน้า PDF
     xPosition = (pageWidth - picWidth) / 2; // คำนวณตำแหน่ง x ให้อยู่กลางหน้า
-
+    let indexData = indexGraph;
+    if (dataReport[dataReport.length - 1][indexGraph[0]].ItemReportName !== 'SPGA (TP)' &&
+      dataReport[dataReport.length - 1][indexGraph[0]].ItemReportName !== 'Coating weight (g/m2)') {
+      indexData = 31;
+    }
     // เตรียมภาพ
     for (let i = 0; i < indexGraph.length; i++) {
       picGraph.push(await GraphPic1(dataReport, indexGraph[i])); // สร้างภาพกราฟ
@@ -449,9 +457,9 @@ async function SetGraph1(dataReport, doc, indexGraph, xPosition) {
         [
           {
             content:
-              dataReport[dataReport.length - 1][indexGraph[i]].ItemReportName +
+              dataReport[dataReport.length - 1][indexData].ItemReportName +
               " (" +
-              dataReport[dataReport.length - 1][indexGraph[i]].ControlRange +
+              dataReport[dataReport.length - 1][indexData].ControlRange +
               ")",
           },
         ],
@@ -473,7 +481,7 @@ async function SetGraph1(dataReport, doc, indexGraph, xPosition) {
       head: [
         [
           {
-            content: dataReport[dataReport.length - 1][indexGraph[0]].ProcessReportName,
+            content: dataReport[dataReport.length - 1][indexData].ProcessReportName,
             styles: {
               textColor: 0,
               halign: "center",
