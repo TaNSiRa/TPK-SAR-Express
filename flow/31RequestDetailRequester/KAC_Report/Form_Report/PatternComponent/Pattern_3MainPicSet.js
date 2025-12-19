@@ -6,254 +6,232 @@ const dtConv = require("../../../../../function/dateTime");
 exports.PicSet = async (dataReport, doc, currentY) => {
   try {
     console.log("PicSet");
-    var foundData = 0;
-    for (let i = 0; i < dataReport.length; i++) {
-      if (dataReport[i].ReportOrder > 100) {
-        foundData++;
-      }
-    }
-    if (foundData > 0) {
-      /* if (currentY >= 190) { */
+
+    // --------------------------------
+    // 1. Header Section
+    // --------------------------------
+    let hasPicData = dataReport.some(d => d.ReportOrder > 100);
+
+    if (hasPicData) {
       if (currentY >= 170) {
         doc.addPage();
         currentY = 10;
       }
+
       doc.autoTable({
         startY: currentY + 4,
-        head: [
-          [
-            {
-              content: "Quality of phosphate film.",
-              styles: {
-                textColor: 0,
-                halign: "center",
-                valign: "middle",
-                fillColor: [3, 244, 252],
-                font: "THSarabun",
-                fontStyle: "bold",
-                fontSize: 12,
-                cellPadding: 1,
-                lineColor: 0,
-                lineWidth: 0.1,
-                maxCellHeight: 12,
-                cellWidth: 50,
-              },
-            },
-          ],
-        ],
-        //body: body,
-        theme: "grid",
-      });
-    }
-    currentY = doc.lastAutoTable.finalY;
-
-    var countSetPic = 0;
-    var picHeight = 55;
-    var picWidht = 90;
-    for (let i = 0; i < dataReport.length; i++) {
-      if (dataReport[i].ReportOrder > 100) {
-        var dataInTable = [];
-        var countSpan = 1;
-        var dataBuff = [];
-        //count data before pic (span)
-        for (let j = i; j < dataReport.length; j++) {
-          if (dataReport[j].ReportOrder != 105 + countSetPic * 10) {
-            countSpan++;
-          } else if (dataReport[j].ReportOrder >= 105 + countSetPic * 10) {
-            break;
-          }
-        }
-        for (i; i < dataReport.length; i++) {
-          //merge dupicate
-          dataBuff.push(dataReport[i]);
-          if (dataReport[i].ReportOrder == 101 + countSetPic * 10) {
-            dataInTable.push([
-              {
-                rowSpan: countSpan,
-                content: dataReport[i].ProcessReportName,
-                style: {
-                  fontSize: 20,
-                },
-              },
-              dataReport[i].ItemReportName,
-              dataReport[i].ControlRange,
-              dataReport[i].ResultReport,
-              dataReport[i].Evaluation,
-            ]);
-          } else if (dataReport[i].ReportOrder < 105 + countSetPic * 10) {
-            dataInTable.push([
-              //dataReport[i].ProcessReportName,
-              dataReport[i].ItemReportName,
-              dataReport[i].ControlRange,
-              dataReport[i].ResultReport,
-              dataReport[i].Evaluation,
-            ]);
-          } else if (dataReport[i].ReportOrder == 105 + countSetPic * 10) {
-            dataInTable.push([
-              //dataReport[i].ProcessReportName,
-              dataReport[i].ItemReportName,
-              {
-                colSpan: 3,
-                content: "",
-                styles: {
-                  valign: "middle",
-                  halign: "center",
-                  minCellHeight: picHeight,
-                },
-              },
-              dataReport[i].ControlRange,
-              dataReport[i].ResultReport,
-              dataReport[i].Evaluation,
-            ]);
-          }
-
-          //Check end found pic
-          if (dataReport[i].ReportOrder >= 105 + countSetPic * 10) {
-            if (dataReport[i].ReportOrder != 105 + countSetPic * 10) {
-              i--;
-            }
-            countSetPic++;
-            break;
-          }
-        }
-
-        if (i >= dataReport.length) {
-          i--;
-        }
-        if (dataReport[i].ReportOrder == 105 + countSetPic * 10) {
-          /* if (currentY >= 190) { */
-          if (currentY >= 170) {
-            doc.addPage();
-            currentY = 10;
-          }
-          /*  } else if (currentY >= 230) { */
-        } else if (currentY >= 170) {
-          doc.addPage();
-          currentY = 10;
-        }
-
-        doc.autoTable({
-          startY: currentY + 4,
-          head: [
-            [
-              "MATERIAL",
-              "CHECK ITEM",
-              {
-                content: "CONTROLED RANGE",
-                styles: {
-                  textColor: 0,
-                  halign: "center",
-                  valign: "middle",
-                  font: "THSarabun",
-                  fontStyle: "bold",
-                  fontSize: 11,
-                },
-              },
-              "RESULT",
-              "EVALUATION",
-            ],
-          ],
-          headStyles: {
+        head: [[{
+          content: "Quality of phosphate film.",
+          styles: {
             textColor: 0,
             halign: "center",
             valign: "middle",
-            fillColor: [140, 255, 219],
+            fillColor: [3, 244, 252],
             font: "THSarabun",
             fontStyle: "bold",
-            fontSize: 15,
+            fontSize: 12,
             cellPadding: 1,
             lineColor: 0,
             lineWidth: 0.1,
-            minCellHeight: 10,
-            maxCellHeight: 12,
+            cellWidth: 50,
           },
-          body: dataInTable,
-          bodyStyles: {
-            textColor: 0,
-            halign: "center",
-            valign: "middle",
-            fillColor: [255, 255, 255],
-            font: "THSarabun",
-            fontStyle: "normal",
-            fontSize: 13,
-            cellPadding: 1,
-            lineColor: 0,
-            lineWidth: 0.1,
-            maxCellHeight: 11,
-            //cellWidth: 17,
-          },
-          columnStyles: {
-            //0: {cellWidth : 20},
-            0: { fillColor: [211, 239, 240] },
-            1: { cellWidth: 35 },
-            2: { cellWidth: 30 },
-            3: { cellWidth: 30 },
-            4: { cellWidth: 30 },
-          },
-          allSectionHooks: true,
-          willDrawCell: function (data) {
-            if (data.row.index == countSpan - 1 && data.column.index == 2) {
-              data.cell.raw = "";
+        }]],
+        theme: "grid",
+      });
+
+      currentY = doc.lastAutoTable.finalY;
+    }
+
+    // --------------------------------
+    // 2. Config
+    // --------------------------------
+    let countSetPic = 0;
+    const picHeight = 55;
+    const picWidth = 90;
+
+    // --------------------------------
+    // 3. Loop data
+    // --------------------------------
+    for (let i = 0; i < dataReport.length; i++) {
+      if (dataReport[i].ReportOrder <= 100) continue;
+
+      const picBase = 105 + countSetPic * 10;
+      const isPicRow = (ro) => ro === picBase || ro === picBase + 1;
+
+      let dataInTable = [];
+      let dataBuff = [];
+      let countSpan = 0;
+
+      // --------------------------------
+      // 4. Count rowSpan (รวม 105 + 106)
+      // --------------------------------
+      for (let j = i; j < dataReport.length; j++) {
+        countSpan++;
+        if (dataReport[j].ReportOrder >= picBase + 1) break;
+      }
+
+      // --------------------------------
+      // 5. Build table body
+      // --------------------------------
+      for (; i < dataReport.length; i++) {
+        let row = dataReport[i];
+        dataBuff.push(row);
+
+        // MATERIAL row
+        if (row.ReportOrder === 101 + countSetPic * 10) {
+          dataInTable.push([
+            {
+              rowSpan: countSpan,
+              content: row.ProcessReportName,
+              styles: { fontSize: 20 },
+            },
+            row.ItemReportName,
+            row.ControlRange,
+            row.ResultReport,
+            row.Evaluation,
+          ]);
+        }
+        // Normal row
+        else if (row.ReportOrder < picBase) {
+          dataInTable.push([
+            row.ItemReportName,
+            row.ControlRange,
+            row.ResultReport,
+            row.Evaluation,
+          ]);
+        }
+        // Picture rows (105, 106)
+        else if (isPicRow(row.ReportOrder)) {
+          dataInTable.push([
+            row.ItemReportName,
+            {
+              colSpan: 3,
+              content: "",
+              styles: {
+                valign: "middle",
+                halign: "center",
+                minCellHeight: picHeight,
+              },
+            },
+            row.ControlRange,
+            row.ResultReport,
+            row.Evaluation,
+          ]);
+        }
+
+        // end group when reach 106
+        if (row.ReportOrder >= picBase + 1) {
+          countSetPic++;
+          break;
+        }
+      }
+
+      // --------------------------------
+      // 6. Page break
+      // --------------------------------
+      if (currentY >= 170) {
+        doc.addPage();
+        currentY = 10;
+      }
+
+      // --------------------------------
+      // 7. Draw table
+      // --------------------------------
+      doc.autoTable({
+        startY: currentY + 4,
+        head: [[
+          "MATERIAL",
+          "CHECK ITEM",
+          "CONTROLED RANGE",
+          "RESULT",
+          "EVALUATION",
+        ]],
+        headStyles: {
+          textColor: 0,
+          halign: "center",
+          valign: "middle",
+          fillColor: [140, 255, 219],
+          font: "THSarabun",
+          fontStyle: "bold",
+          fontSize: 15,
+          cellPadding: 1,
+          lineColor: 0,
+          lineWidth: 0.1,
+        },
+        body: dataInTable,
+        bodyStyles: {
+          textColor: 0,
+          halign: "center",
+          valign: "middle",
+          font: "THSarabun",
+          fontSize: 13,
+          cellPadding: 1,
+          lineColor: 0,
+          lineWidth: 0.1,
+        },
+        columnStyles: {
+          0: { fillColor: [211, 239, 240] },
+          1: { cellWidth: 35 },
+          2: { cellWidth: 30 },
+          3: { cellWidth: 30 },
+          4: { cellWidth: 30 },
+        },
+
+        // --------------------------------
+        // 8. Hooks
+        // --------------------------------
+        willDrawCell: (data) => {
+          if (data.column.index === 3 && data.section === "body") {
+            let ev = dataBuff[data.row.index]?.Evaluation;
+            if (["LOW", "HIGH", "NOT PASS", "NG"].includes(ev)) {
+              doc.setTextColor(231, 76, 60);
             }
-            if (data.column.index === 3 && data.section === "body") {
-              if (
-                dataBuff[data.row.index].Evaluation == "LOW" ||
-                dataBuff[data.row.index].Evaluation == "HIGH" ||
-                dataBuff[data.row.index].Evaluation == "NOT PASS" ||
-                dataBuff[data.row.index].Evaluation == "NG"
-              ) {
-                doc.setTextColor(231, 76, 60); // Red
-              }
+          }
+          if (data.column.index === 4 && data.section === "body") {
+            if (["LOW", "HIGH", "NOT PASS", "NG"].includes(data.cell.raw)) {
+              doc.setTextColor(231, 76, 60);
             }
-            if (data.column.index === 4 && data.section === "body") {
-              if (
-                data.cell.raw == "LOW" ||
-                data.cell.raw == "HIGH" ||
-                data.cell.raw == "NOT PASS" ||
-                data.cell.raw == "NG"
-              ) {
-                doc.setTextColor(231, 76, 60); // Red
-              }
-            }
-          },
-          didDrawCell: function (data) {
-            if (data.row.index == countSpan - 1 && data.column.index == 2) {
-              //check time sign
-              /* console.log(data.row.index);
-              console.log(countSpan);
-              console.log(dataReport[i].ResultReport); */
+          }
+        },
+
+        didDrawCell: (data) => {
+          if (data.column.index === 2 && data.section === "body") {
+            let rowData = dataBuff[data.row.index];
+            if (isPicRow(rowData.ReportOrder)) {
               try {
                 let bitmap = fs.readFileSync(
                   "C:\\AutomationProject\\SAR\\asset\\" +
-                  dataReport[i].ResultReport
+                  rowData.ResultReport
                 );
+
                 doc.addImage(
                   bitmap.toString("base64"),
                   "jpg",
                   data.cell.x + 1,
                   data.cell.y + 1,
-                  picWidht - 2,
+                  picWidth - 2,
                   picHeight - 2
                 );
               } catch (err) {
-                console.log("error pic" + err);
+                console.log("error pic:", err);
               }
             }
-          },
+          }
+        },
 
-          theme: "grid",
-        });
-        currentY = doc.lastAutoTable.finalY;
-      }
+        theme: "grid",
+      });
+
+      currentY = doc.lastAutoTable.finalY;
     }
 
-    currentY = doc.lastAutoTable.finalY;
     return [doc, currentY];
   } catch (err) {
     console.log(err);
     return err;
   }
 };
+
 
 exports.PicSetTHACOM = async (dataReport, doc, currentY) => {
   try {
