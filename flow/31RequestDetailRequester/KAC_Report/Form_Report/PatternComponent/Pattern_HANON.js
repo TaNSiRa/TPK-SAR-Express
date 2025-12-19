@@ -38,6 +38,7 @@ exports.CoatingPre = async (dataReport, doc, currentY) => {
     var dataInTable = [];
     var i = 0;
     var indexStart = 0;
+    var indexColor = [];
     //find data
     for (i = 0; i < dataReport.length; i++) {
       if (dataReport[i].ReportOrder >= 100) {
@@ -45,7 +46,7 @@ exports.CoatingPre = async (dataReport, doc, currentY) => {
         break;
       }
     }
-    console.log(indexStart);
+    // console.log('test' + indexStart);
 
     for (i = indexStart; i < dataReport.length; i) {
       if (dataReport[i].ResultReport != "N/A") {
@@ -58,6 +59,7 @@ exports.CoatingPre = async (dataReport, doc, currentY) => {
           dataReport[i + 4].ResultReport,
           dataReport[i + 5].ResultReport,
         ]);
+        indexColor.push(i);
       }
       i = i + 6;
     }
@@ -130,8 +132,9 @@ exports.CoatingPre = async (dataReport, doc, currentY) => {
       },
       willDrawCell: function (data) {
         if (data.column.index != 0 && data.section === "body") {
-          indexCheck =
-            indexStart + data.row.index * 6 + (data.column.index - 1);
+          // indexCheck =
+          //   indexStart + data.row.index * 6 + (data.column.index - 1);
+          indexCheck = indexColor[data.row.index] + (data.column.index - 1);
           if (
             dataReport[indexCheck].Evaluation == "LOW" ||
             dataReport[indexCheck].Evaluation == "HIGH" ||
