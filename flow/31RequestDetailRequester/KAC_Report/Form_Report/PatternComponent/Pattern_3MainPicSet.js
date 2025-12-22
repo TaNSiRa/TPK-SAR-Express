@@ -122,7 +122,11 @@ exports.PicSet = async (dataReport, doc, currentY) => {
         }
 
         // end group when reach 106
-        if (row.ReportOrder >= picBase + 1) {
+        if (row.ReportOrder == picBase + 1) {
+          countSetPic++;
+          break;
+        }
+        if (row.ReportOrder > picBase + 1) {
           countSetPic++;
           i--;
           break;
