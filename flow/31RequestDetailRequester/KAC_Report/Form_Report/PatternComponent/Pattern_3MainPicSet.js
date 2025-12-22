@@ -55,7 +55,7 @@ exports.PicSet = async (dataReport, doc, currentY) => {
     for (let i = 0; i < dataReport.length; i++) {
       if (dataReport[i].ReportOrder <= 100) continue;
 
-      const picBase = 105 + countSetPic * 10;
+      const picBase = 105 + (countSetPic * 10);
       const isPicRow = (ro) => ro === picBase || ro === picBase + 1;
 
       let dataInTable = [];
@@ -76,7 +76,8 @@ exports.PicSet = async (dataReport, doc, currentY) => {
       for (; i < dataReport.length; i++) {
         let row = dataReport[i];
         dataBuff.push(row);
-
+        console.log(row.ReportOrder);
+        console.log(picBase);
         // MATERIAL row
         if (row.ReportOrder === 101 + countSetPic * 10) {
           dataInTable.push([
@@ -100,6 +101,7 @@ exports.PicSet = async (dataReport, doc, currentY) => {
             row.Evaluation,
           ]);
         }
+
         // Picture rows (105, 106)
         else if (isPicRow(row.ReportOrder)) {
           dataInTable.push([
@@ -122,6 +124,7 @@ exports.PicSet = async (dataReport, doc, currentY) => {
         // end group when reach 106
         if (row.ReportOrder >= picBase + 1) {
           countSetPic++;
+          i--;
           break;
         }
       }
