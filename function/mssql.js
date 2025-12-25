@@ -30,7 +30,7 @@ const config = {
 
 exports.qurey = async (QueryText) => {
   try {
-    console.log(`---------------`);
+    // console.log(`---------------`);
     let out;
     await mssql.connect(config)
     const result = await mssql.query(QueryText).then((v) => {
