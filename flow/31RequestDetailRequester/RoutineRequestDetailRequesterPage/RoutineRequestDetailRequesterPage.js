@@ -269,4 +269,49 @@ router.post(
   }
 );
 
+router.post('/ApproverForEditSendReport', async (req, res) => {
+  console.log("--ApproverForEditSendReport--");
+
+  let query = `
+    SELECT Name 
+    FROM [SAR].[dbo].[Master_User] 
+    WHERE Branch = '${req.body.branch}'
+    AND Permission = 'Approver'
+  `;
+
+  let db = await mssql.qurey(query);
+
+  if (db.recordset.length > 0) {
+    return res.status(200).json(db.recordset); // 👈 ส่ง list กลับ
+  } else {
+    return res.status(400).json({ message: 'Approver not found' });
+  }
+});
+
+router.post(
+  "/EditSentReportDate",
+  async (req, res) => {
+    console.log("in EditSentReportDate");
+    try {
+      var ReqNo = req.body.ReqNo;
+      var ReportDate = req.body.ReportDate;
+      var User = req.body.User;
+      var dt = dtget.DateTimeNow();
+      var query = `update [Routine_RequestLab] set SentRep =  '${ReportDate}', UserEditSentRep = '${User}', UserEditSentRep_Date = '${dt}'
+      where reqNo = '${ReqNo}';`;
+
+      console.log(query);
+      await mssql.qurey(query);
+
+
+
+      res.send("OK");
+    } catch (error) {
+      console.log(error);
+      res.status(400);
+      res.json("ERROR");
+    }
+  }
+);
+
 module.exports = router;
