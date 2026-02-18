@@ -50,6 +50,7 @@ exports.PicSet = async (dataReport, doc, currentY) => {
       "",
       dataReport[i + 2].ResultReport,
     ]);
+    console.log("dataInTable " + dataInTable);
     doc.autoTable({
       startY: doc.lastAutoTable.finalY + 4,
       head: [
@@ -92,53 +93,127 @@ exports.PicSet = async (dataReport, doc, currentY) => {
       },
       didDrawCell: function (data) {
         if (data.column.index == 1 && data.section === "body") {
-          try {
-            var bitmap;
+          const resultVal = dataReport[i].ResultReport;
+          if (!resultVal || resultVal.trim() === "") {
+            // วาดข้อความ - แทน
+            doc.setFont("THSarabun", "normal");
+            doc.setFontSize(13);
+            doc.text(
+              "-",
+              data.cell.x + data.cell.width / 2,
+              data.cell.y + data.cell.height / 2,
+              { align: "center", baseline: "middle" }
+            );
+          } else {
             try {
-              bitmap = fs.readFileSync(
-                "C:\\AutomationProject\\SAR\\asset\\" +
-                  dataReport[i].ResultReport
+              var bitmap;
+              try {
+                bitmap = fs.readFileSync(
+                  "C:\\AutomationProject\\SAR\\asset\\" + resultVal
+                );
+              } catch (err) {
+                console.log("error pic" + err);
+                bitmap = fs.readFileSync("C:\\SAR\\asset\\NotFoundPic.jpg");
+              }
+              doc.addImage(
+                bitmap.toString("base64"),
+                "jpg",
+                data.cell.x + 1,
+                data.cell.y + 1,
+                picWidth - 2,
+                picHeight - 2
               );
             } catch (err) {
               console.log("error pic" + err);
-              bitmap = fs.readFileSync("C:\\SAR\\asset\\NotFoundPic.jpg");
             }
-            doc.addImage(
-              bitmap.toString("base64"),
-              "jpg",
-              data.cell.x + 1,
-              data.cell.y + 1,
-              picWidth - 2,
-              picHeight - 2
-            );
-          } catch (err) {
-            console.log("error pic" + err);
           }
         }
+
         if (data.column.index == 2 && data.section === "body") {
-          try {
-            var bitmap;
+          const resultVal = dataReport[i + 1].ResultReport;
+          if (!resultVal || resultVal.trim() === "") {
+            // วาดข้อความ - แทน
+            doc.setFont("THSarabun", "normal");
+            doc.setFontSize(13);
+            doc.text(
+              "-",
+              data.cell.x + data.cell.width / 2,
+              data.cell.y + data.cell.height / 2,
+              { align: "center", baseline: "middle" }
+            );
+          } else {
             try {
-              bitmap = fs.readFileSync(
-                "C:\\AutomationProject\\SAR\\asset\\" +
-                  dataReport[i + 1].ResultReport
+              var bitmap;
+              try {
+                bitmap = fs.readFileSync(
+                  "C:\\AutomationProject\\SAR\\asset\\" + resultVal
+                );
+              } catch (err) {
+                bitmap = fs.readFileSync("C:\\SAR\\asset\\NotFoundPic.jpg");
+              }
+              doc.addImage(
+                bitmap.toString("base64"),
+                "jpg",
+                data.cell.x + 1,
+                data.cell.y + 1,
+                picWidth - 2,
+                picHeight - 2
               );
             } catch (err) {
-              bitmap = fs.readFileSync("C:\\SAR\\asset\\NotFoundPic.jpg");
+              console.log("error pic" + err);
             }
-            doc.addImage(
-              bitmap.toString("base64"),
-              "jpg",
-              data.cell.x + 1,
-              data.cell.y + 1,
-              picWidth - 2,
-              picHeight - 2
-            );
-          } catch (err) {
-            console.log("error pic" + err);
           }
         }
       },
+      // didDrawCell: function (data) {
+      //   if (data.column.index == 1 && data.section === "body") {
+      //     try {
+      //       var bitmap;
+      //       try {
+      //         bitmap = fs.readFileSync(
+      //           "C:\\AutomationProject\\SAR\\asset\\" +
+      //             dataReport[i].ResultReport
+      //         );
+      //       } catch (err) {
+      //         console.log("error pic" + err);
+      //         bitmap = fs.readFileSync("C:\\SAR\\asset\\NotFoundPic.jpg");
+      //       }
+      //       doc.addImage(
+      //         bitmap.toString("base64"),
+      //         "jpg",
+      //         data.cell.x + 1,
+      //         data.cell.y + 1,
+      //         picWidth - 2,
+      //         picHeight - 2
+      //       );
+      //     } catch (err) {
+      //       console.log("error pic" + err);
+      //     }
+      //   }
+      //   if (data.column.index == 2 && data.section === "body") {
+      //     try {
+      //       var bitmap;
+      //       try {
+      //         bitmap = fs.readFileSync(
+      //           "C:\\AutomationProject\\SAR\\asset\\" +
+      //             dataReport[i + 1].ResultReport
+      //         );
+      //       } catch (err) {
+      //         bitmap = fs.readFileSync("C:\\SAR\\asset\\NotFoundPic.jpg");
+      //       }
+      //       doc.addImage(
+      //         bitmap.toString("base64"),
+      //         "jpg",
+      //         data.cell.x + 1,
+      //         data.cell.y + 1,
+      //         picWidth - 2,
+      //         picHeight - 2
+      //       );
+      //     } catch (err) {
+      //       console.log("error pic" + err);
+      //     }
+      //   }
+      // },
 
       theme: "grid",
     });
