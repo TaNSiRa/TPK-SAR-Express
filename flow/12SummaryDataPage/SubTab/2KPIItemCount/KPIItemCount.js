@@ -54,7 +54,7 @@ exports.searchKPIData = async (dataIn) => {
     sum (case when ((day(dataR.ApproveDate1) <> day(dataR.DueDate1) and dataR.ApproveDate1 > dataR.DueDate1 ) or (day(dataR.ApproveDate2) <> day(dataR.DueDate2) and dataR.ApproveDate2 > dataR.DueDate2 ) or (day(dataR.ApproveDate3) <> day(dataR.DueDate3) and dataR.ApproveDate3 > dataR.DueDate3 ) )  and dataR.code = 'KAN' and dataR.ErrorName is null  then 1 else 0 end) as kANOverDueCount ,
     sum (case when dataR.ErrorName is not null then 1 else 0 end) as instrumentBDCount
     FROM Routine_RequestLab as dataR left join Master_User as dataU on dataR.useranalysis1 = dataU.name
-    where dataR.itemstatus not in ('NOT SEND SAMPLE','COMPLETE NO LAB','CANCEL REQUEST') 
+    where dataR.itemstatus not in ('NOT SEND SAMPLE','COMPLETE NO LAB','CANCEL REQUEST','CANCEL ITEM','CLOSE LINE') 
     and Month(dataR.receivedate) = ${dataIn[0].Month} and Year(dataR.receivedate) = ${dataIn[0].Year} `;
     if (dataIn[0].CustomerName != "") {
       query = query + `and dataR.custfull = '${dataIn[0].CustomerName}' `;
@@ -244,7 +244,7 @@ exports.getDataCreateExcel = async (dataIn) => {
     0 as ALL_SUM
     
     FROM Routine_RequestLab as dataR left join Master_User as dataU on dataR.useranalysis1 = dataU.name
-    where dataR.itemstatus not in ('NOT SEND SAMPLE','COMPLETE NO LAB','CANCEL REQUEST')
+    where dataR.itemstatus not in ('NOT SEND SAMPLE','COMPLETE NO LAB','CANCEL REQUEST','CANCEL ITEM','CLOSE LINE')
     and Month(dataR.receivedate) = ${dataIn[0].Month} and Year(dataR.receivedate) = ${dataIn[0].Year} `;
     if (dataIn[0].CustomerName != "") {
       query = query + `and dataR.custfull = '${dataIn[0].CustomerName}' `;
@@ -382,7 +382,6 @@ exports.searchKPIDatabackup2 = async (dataIn) => {
     if (dataIn[0].InstrumentName != "") {
       query = query + `and instrumentName = '${dataIn[0].InstrumentName}' `;
     }
-
     query =
       query +
       `
@@ -391,7 +390,6 @@ exports.searchKPIDatabackup2 = async (dataIn) => {
     var buffData = await mssql.qurey(query);
     //console.log(query);
     dataOut = buffData.recordset;
-
     return dataOut;
   } catch (error) {
     console.log(error);
