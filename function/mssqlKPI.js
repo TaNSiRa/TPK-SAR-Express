@@ -12,6 +12,7 @@ const config = {
   options: {
     encrypt: false, // for azure
     //trustServerCertificate: true, // change to true for local dev / self-signed certs
+    appName : "master sar back - SARKPI"
   }
 }
 
