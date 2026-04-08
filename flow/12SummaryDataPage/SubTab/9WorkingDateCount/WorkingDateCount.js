@@ -49,12 +49,16 @@ exports.searchWorkingDateCountData = async (dataIn) => {
     //console.log(dataWorkingDate);
 
     //search Holiday date
+    const monthStart = parseInt(dataIn[0].Month, 10);
+    const yearStart = parseInt(dataIn[0].Year, 10);
+    // var monthStart = dataIn[0].Month;
+    // var monthEnd = 0;
+    // var yearStart = dataIn[0].Year;
+    // var yearEnd = dataIn[0].Year;
+    let monthEnd;
+    let yearEnd = yearStart;
 
-    var monthStart = dataIn[0].Month;
-    var monthEnd = 0;
-    var yearStart = dataIn[0].Year;
-    var yearEnd = dataIn[0].Year;
-    if (monthStart != 12) {
+    if (monthStart !== 12) {
       monthEnd = monthStart + 1;
     } else {
       monthEnd = 1;
