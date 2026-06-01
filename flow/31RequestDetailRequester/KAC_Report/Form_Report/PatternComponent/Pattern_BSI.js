@@ -151,6 +151,15 @@ exports.CoatingPre = async (dataReport, doc, currentY) => {
         3: { cellWidth: 30 },
         4: { cellWidth: 30 },
       },
+      willDrawCell: function (data) {
+        if (
+          data.column.index === 4 &&
+          data.section === "body" &&
+          data.cell.raw.content !== "PASS"
+        ) {
+          doc.setTextColor(231, 76, 60); // Red
+        }
+      },
       theme: "grid",
     });
     currentY = doc.lastAutoTable.finalY;
@@ -265,7 +274,7 @@ exports.Big2Sem = async (dataReport, doc, currentY) => {
             try {
               bitmap = fs.readFileSync(
                 "C:\\AutomationProject\\SAR\\asset\\" +
-                  dataReport[i].ResultReport
+                dataReport[i].ResultReport
               );
             } catch (err) {
               console.log("error pic" + err);
@@ -293,7 +302,7 @@ exports.Big2Sem = async (dataReport, doc, currentY) => {
             try {
               bitmap = fs.readFileSync(
                 "C:\\AutomationProject\\SAR\\asset\\" +
-                  dataReport[i + 1].ResultReport
+                dataReport[i + 1].ResultReport
               );
             } catch (err) {
               bitmap = fs.readFileSync("C:\\SAR\\asset\\NotFoundPic.jpg");
@@ -318,7 +327,7 @@ exports.Big2Sem = async (dataReport, doc, currentY) => {
     currentY = doc.lastAutoTable.finalY;
 
     doc.autoTable({
-      startY: doc.lastAutoTable.finalY ,
+      startY: doc.lastAutoTable.finalY,
       head: [["**REMARK : " + dataReport[i + 2].ResultReport]],
       headStyles: {
         textColor: 0,
@@ -329,8 +338,8 @@ exports.Big2Sem = async (dataReport, doc, currentY) => {
         fontStyle: "bold",
         fontSize: 12,
         cellPadding: 1,
-/*         lineColor: 0,
-        lineWidth: 0.1, */
+        /*         lineColor: 0,
+                lineWidth: 0.1, */
         maxCellHeight: 12,
       },
 
