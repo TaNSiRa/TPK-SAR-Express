@@ -34,7 +34,8 @@ exports.searchWorkingDateCountData = async (dataIn) => {
   try {
     dataIn = JSON.parse(dataIn.SearchOption);
     var query = `SELECT id,instrumentName,receiveDate,resultApproveDate,branch,code
-    FROM Routine_RequestLab where requeststatus not in ('NOT SEND SAMPLE','COMPLETE NO LAB','CANCEL REQUEST')  
+    FROM Routine_RequestLab where requeststatus not in ('NOT SEND SAMPLE','COMPLETE NO LAB','CANCEL REQUEST')
+    and itemstatus not in ('CANCEL ITEM')  
     and ResultApproveDate is not null
     and Month(receivedate) = ${dataIn[0].Month} and Year(receivedate) = ${dataIn[0].Year} `;
     if (dataIn[0].CustomerName != "") {
