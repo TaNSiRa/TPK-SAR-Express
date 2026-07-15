@@ -52,6 +52,7 @@ const Pattern_GASBP = require("./Pattern_GASBP.js");
 const Pattern_ATT = require("./Pattern_ATT.js");
 const Pattern_THACOM = require("./Pattern_THACOM.js");
 const Pattern_DAIKINAC131 = require("./Pattern_DAIKINAC131.js");
+const Pattern_K1NANO = require("./Pattern_K1NANO.js");
 
 exports.SelectPattern = async (dataReport) => {
   try {
@@ -174,6 +175,8 @@ exports.SelectPattern = async (dataReport) => {
       var data = await Pattern_THACOM.CreatePDF(dataReport);
     } else if (dataReport[0].PatternReport == "DAIKINAC131") {
       var data = await Pattern_DAIKINAC131.CreatePDF(dataReport);
+    } else if (dataReport[0].PatternReport == "K1NANO") {
+      var data = await Pattern_K1NANO.CreatePDF(dataReport);
     } else {
       {
         console.log("K1");
