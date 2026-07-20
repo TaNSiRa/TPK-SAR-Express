@@ -22,9 +22,13 @@ exports.CreatePDF = async (dataReport) => {
     AND MONTH(SamplingDate) = ${monthRequest} 
     AND YEAR(SamplingDate) = ${yearRequest} order by SamplingDate,reportorder`
     ); */ dataBuff = await mssql.qurey(
-      `select * from Routine_KACReport where Custfull = '${CustFull}' 
-      AND SamplingDate <= '${dtget.toDateSQL(dataReport[0].SamplingDate)}'
-      AND YEAR(SamplingDate) = ${yearRequest} order by SamplingDate,reportorder`
+      `select kac.*, lab.RequestStatus, lab.SampleStatus, lab.ItemStatus
+      from Routine_KACReport kac
+      left join Routine_RequestLab lab
+        on kac.ReqNo = lab.ReqNo and kac.ReportOrder = lab.ReportOrder
+      where kac.Custfull = '${CustFull}'
+      AND kac.SamplingDate <= '${dtget.toDateSQL(dataReport[0].SamplingDate)}'
+      AND YEAR(kac.SamplingDate) = ${yearRequest} order by kac.SamplingDate,kac.reportorder`
     );
     dataBuff = dataBuff.recordset;
 

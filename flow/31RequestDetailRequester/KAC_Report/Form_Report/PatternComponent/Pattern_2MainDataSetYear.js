@@ -3,6 +3,35 @@ const { autoTable } = require("jspdf-autotable");
 const fs = require("fs");
 const dtget = require("../../../../../function/dateTime");
 
+// อ่านค่าสถานะทั้งหมดที่เกี่ยวข้องจาก record (RequestStatus, SampleStatus, ItemStatus)
+// join มาจาก Routine_RequestLab -> ดูที่ Pattern_Y2TM.js
+function getStatusList(record) {
+  if (!record) return [];
+  const keys = [
+    "RequestStatus",
+    "requeststatus",
+    "SampleStatus",
+    "samplestatus",
+    "ItemStatus",
+    "itemstatus",
+    "Status",
+    "status",
+  ];
+  return keys
+    .map((k) => record[k])
+    .filter((v) => v !== undefined && v !== null)
+    .map((v) => String(v).trim().toUpperCase());
+}
+
+// เช็คว่า set ข้อมูล (1 วัน sampling) มีสถานะเป็น CLOSE LINE หรือไม่
+// (ถ้า RequestStatus / SampleStatus / ItemStatus อันใดอันหนึ่งเป็น CLOSE LINE)
+function isCloseLine(rows) {
+  return (
+    Array.isArray(rows) &&
+    rows.some((r) => getStatusList(r).includes("CLOSE LINE"))
+  );
+}
+
 exports.DataSetYear = async (dataReport, doc, currentY) => {
   console.log("DataSetYear");
   try {
@@ -252,6 +281,26 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
       fontStyle: "bold",
       fontSize: 9,
     };
+    //CLOSE LINE : ทำพื้นหลังทั้งแถวเป็นสีเทา
+    var colorCloseLine = [190, 190, 190];
+    var styleDIntableCloseLine = {
+      textColor: 0,
+      halign: "center",
+      valign: "middle",
+      fillColor: colorCloseLine,
+      font: "THSarabun",
+      fontStyle: "normal",
+      fontSize: 8,
+    };
+    var styleRowHeadCloseLine = {
+      textColor: 0,
+      halign: "center",
+      fillColor: colorCloseLine,
+      valign: "middle",
+      font: "THSarabun",
+      fontStyle: "bold",
+      fontSize: 9,
+    };
 
     // j = index month 1 set do 2 value
     // i = index item in month
@@ -260,6 +309,9 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
       //set 1 (row J)
       let checkHaveData1 = true;
       let checkHaveData2 = true;
+      //CLOSE LINE : ถ้า set ไหนสถานะเป็น CLOSE LINE ให้แถวนั้นเป็นสีเทาทั้งแถว
+      let closeLine1 = isCloseLine(dataReport[j]);
+      let closeLine2 = isCloseLine(dataReport[j + 1]);
       if (
         dataReport[j][0].ResultReport == "-" &&
         dataReport[j][1].ResultReport == "-" &&
@@ -277,37 +329,63 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
         checkHaveData2 = false;
       }
 
+      //month cell : เทาเมื่อทั้งเดือน (ทั้ง 2 set) เป็น CLOSE LINE
       dataInTable.push([
-        { rowSpan: 2, content: months[j], styles: styleRowHeadDBlue },
+        {
+          rowSpan: 2,
+          content: months[j],
+          styles:
+            closeLine1 && closeLine2 ? styleRowHeadCloseLine : styleRowHeadDBlue,
+        },
       ]);
 
       dataInTable[j].push(
         {
-          content: checkHaveData1
-            ? dtget.toDateOnly(dataReport[j][0].SamplingDate)
-            : "",
-          styles: checkHaveData1 ? styleDIntable : styleDIntableNoData,
+          content:
+            !closeLine1 && checkHaveData1
+              ? dtget.toDateOnly(dataReport[j][0].SamplingDate)
+              : "",
+          styles: closeLine1
+            ? styleDIntableCloseLine
+            : checkHaveData1
+              ? styleDIntable
+              : styleDIntableNoData,
         },
         {
-          content: checkHaveData1
-            ? dtget.toDateOnly(dataReport[j][0].CreateReportDate)
-            : "",
-          styles: checkHaveData1 ? styleDIntable : styleDIntableNoData,
+          content:
+            !closeLine1 && checkHaveData1
+              ? dtget.toDateOnly(dataReport[j][0].CreateReportDate)
+              : "",
+          styles: closeLine1
+            ? styleDIntableCloseLine
+            : checkHaveData1
+              ? styleDIntable
+              : styleDIntableNoData,
         }
       );
       // set 2 (row J + 1)
       dataInTable.push([
         {
-          content: checkHaveData2
-            ? dtget.toDateOnly(dataReport[j + 1][0].SamplingDate)
-            : "",
-          styles: checkHaveData2 ? styleDIntable : styleDIntableNoData,
+          content:
+            !closeLine2 && checkHaveData2
+              ? dtget.toDateOnly(dataReport[j + 1][0].SamplingDate)
+              : "",
+          styles: closeLine2
+            ? styleDIntableCloseLine
+            : checkHaveData2
+              ? styleDIntable
+              : styleDIntableNoData,
         },
         {
-          content: checkHaveData2
-            ? dtget.toDateOnly(dataReport[j + 1][0].CreateReportDate)
-            : "",
-          styles: checkHaveData2 ? styleDIntable : styleDIntableNoData,
+          content:
+            !closeLine2 && checkHaveData2
+              ? dtget.toDateOnly(dataReport[j + 1][0].CreateReportDate)
+              : "",
+          styles: closeLine2
+            ? styleDIntableCloseLine
+            : checkHaveData2
+              ? styleDIntable
+              : styleDIntableNoData,
         },
       ]);
 
@@ -315,7 +393,9 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
       for (let i = 0; i < dataReport[j].length; i++) {
         //set 1
         let styleData;
-        if (checkHaveData1 == false) {
+        if (closeLine1) {
+          styleData = styleDIntableCloseLine;
+        } else if (checkHaveData1 == false) {
           styleData = styleDIntableNoData;
         } else if (
           dataReport[j][i].Evaluation != "PASS" &&
@@ -328,12 +408,15 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
         }
 
         dataInTable[j].push({
-          content: checkHaveData1 ? dataReport[j][i].ResultReport : "",
+          content:
+            !closeLine1 && checkHaveData1 ? dataReport[j][i].ResultReport : "",
           styles: styleData,
         });
         //set 2
         let styleData2;
-        if (checkHaveData2 == false) {
+        if (closeLine2) {
+          styleData2 = styleDIntableCloseLine;
+        } else if (checkHaveData2 == false) {
           styleData2 = styleDIntableNoData;
         } else if (
           dataReport[j + 1][i].Evaluation != "PASS" &&
@@ -345,7 +428,10 @@ exports.DataSetYear = async (dataReport, doc, currentY) => {
           styleData2 = styleDIntable;
         }
         dataInTable[j + 1].push({
-          content: checkHaveData2 ? dataReport[j + 1][i].ResultReport : "",
+          content:
+            !closeLine2 && checkHaveData2
+              ? dataReport[j + 1][i].ResultReport
+              : "",
           styles: styleData2,
         });
       }
@@ -697,6 +783,26 @@ exports.DataSetYearA3 = async (dataReport, doc, currentY) => {
       fontStyle: "bold",
       fontSize: 9,
     };
+    //CLOSE LINE : ทำพื้นหลังทั้งแถวเป็นสีเทา
+    var colorCloseLine = [190, 190, 190];
+    var styleDIntableCloseLine = {
+      textColor: 0,
+      halign: "center",
+      valign: "middle",
+      fillColor: colorCloseLine,
+      font: "THSarabun",
+      fontStyle: "normal",
+      fontSize: 8,
+    };
+    var styleRowHeadCloseLine = {
+      textColor: 0,
+      halign: "center",
+      fillColor: colorCloseLine,
+      valign: "middle",
+      font: "THSarabun",
+      fontStyle: "bold",
+      fontSize: 9,
+    };
 
     // j = index month 1 set do 2 value
     // i = index item in month
@@ -705,6 +811,9 @@ exports.DataSetYearA3 = async (dataReport, doc, currentY) => {
       //set 1 (row J)
       let checkHaveData1 = true;
       let checkHaveData2 = true;
+      //CLOSE LINE : ถ้า set ไหนสถานะเป็น CLOSE LINE ให้แถวนั้นเป็นสีเทาทั้งแถว
+      let closeLine1 = isCloseLine(dataReport[j]);
+      let closeLine2 = isCloseLine(dataReport[j + 1]);
       if (
         dataReport[j][0].ResultReport == "-" &&
         dataReport[j][1].ResultReport == "-" &&
@@ -722,37 +831,63 @@ exports.DataSetYearA3 = async (dataReport, doc, currentY) => {
         checkHaveData2 = false;
       }
 
+      //month cell : เทาเมื่อทั้งเดือน (ทั้ง 2 set) เป็น CLOSE LINE
       dataInTable.push([
-        { rowSpan: 2, content: months[j], styles: styleRowHeadDBlue },
+        {
+          rowSpan: 2,
+          content: months[j],
+          styles:
+            closeLine1 && closeLine2 ? styleRowHeadCloseLine : styleRowHeadDBlue,
+        },
       ]);
 
       dataInTable[j].push(
         {
-          content: checkHaveData1
-            ? dtget.toDateOnly(dataReport[j][0].SamplingDate)
-            : "",
-          styles: checkHaveData1 ? styleDIntable : styleDIntableNoData,
+          content:
+            !closeLine1 && checkHaveData1
+              ? dtget.toDateOnly(dataReport[j][0].SamplingDate)
+              : "",
+          styles: closeLine1
+            ? styleDIntableCloseLine
+            : checkHaveData1
+              ? styleDIntable
+              : styleDIntableNoData,
         },
         {
-          content: checkHaveData1
-            ? dtget.toDateOnly(dataReport[j][0].CreateReportDate)
-            : "",
-          styles: checkHaveData1 ? styleDIntable : styleDIntableNoData,
+          content:
+            !closeLine1 && checkHaveData1
+              ? dtget.toDateOnly(dataReport[j][0].CreateReportDate)
+              : "",
+          styles: closeLine1
+            ? styleDIntableCloseLine
+            : checkHaveData1
+              ? styleDIntable
+              : styleDIntableNoData,
         }
       );
       // set 2 (row J + 1)
       dataInTable.push([
         {
-          content: checkHaveData2
-            ? dtget.toDateOnly(dataReport[j + 1][0].SamplingDate)
-            : "",
-          styles: checkHaveData2 ? styleDIntable : styleDIntableNoData,
+          content:
+            !closeLine2 && checkHaveData2
+              ? dtget.toDateOnly(dataReport[j + 1][0].SamplingDate)
+              : "",
+          styles: closeLine2
+            ? styleDIntableCloseLine
+            : checkHaveData2
+              ? styleDIntable
+              : styleDIntableNoData,
         },
         {
-          content: checkHaveData2
-            ? dtget.toDateOnly(dataReport[j + 1][0].CreateReportDate)
-            : "",
-          styles: checkHaveData2 ? styleDIntable : styleDIntableNoData,
+          content:
+            !closeLine2 && checkHaveData2
+              ? dtget.toDateOnly(dataReport[j + 1][0].CreateReportDate)
+              : "",
+          styles: closeLine2
+            ? styleDIntableCloseLine
+            : checkHaveData2
+              ? styleDIntable
+              : styleDIntableNoData,
         },
       ]);
 
@@ -760,7 +895,9 @@ exports.DataSetYearA3 = async (dataReport, doc, currentY) => {
       for (let i = 0; i < dataReport[j].length; i++) {
         //set 1
         let styleData;
-        if (checkHaveData1 == false) {
+        if (closeLine1) {
+          styleData = styleDIntableCloseLine;
+        } else if (checkHaveData1 == false) {
           styleData = styleDIntableNoData;
         } else if (
           dataReport[j][i].Evaluation != "PASS" &&
@@ -773,12 +910,15 @@ exports.DataSetYearA3 = async (dataReport, doc, currentY) => {
         }
 
         dataInTable[j].push({
-          content: checkHaveData1 ? dataReport[j][i].ResultReport : "",
+          content:
+            !closeLine1 && checkHaveData1 ? dataReport[j][i].ResultReport : "",
           styles: styleData,
         });
         //set 2
         let styleData2;
-        if (checkHaveData2 == false) {
+        if (closeLine2) {
+          styleData2 = styleDIntableCloseLine;
+        } else if (checkHaveData2 == false) {
           styleData2 = styleDIntableNoData;
         } else if (
           dataReport[j + 1][i].Evaluation != "PASS" &&
@@ -790,7 +930,10 @@ exports.DataSetYearA3 = async (dataReport, doc, currentY) => {
           styleData2 = styleDIntable;
         }
         dataInTable[j + 1].push({
-          content: checkHaveData2 ? dataReport[j + 1][i].ResultReport : "",
+          content:
+            !closeLine2 && checkHaveData2
+              ? dataReport[j + 1][i].ResultReport
+              : "",
           styles: styleData2,
         });
       }
