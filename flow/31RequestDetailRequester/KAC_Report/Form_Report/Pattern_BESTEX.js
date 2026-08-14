@@ -602,13 +602,14 @@ async function PicSetAPM(dataReport, CurrentRound, doc, currentY) {
     ];
     var dataInTable = [];
     var picSetData = [];
+    var picRowRound = {}; //body row index -> round index , use for place picture
     var picHeight = 62;
     var picWidht = 80;
-    var runningPic = 0;
 
     //SET PIC Report order 101 102 103
 
     for (j = 0; j < CurrentRound; j++) {
+      picRowRound[dataInTable.length] = j;
       dataInTable.push([
         {
           content: dtget.toDateOnly(dataReport[j][picStartIndex].SamplingDate),
@@ -626,7 +627,8 @@ async function PicSetAPM(dataReport, CurrentRound, doc, currentY) {
       picSetData.push(dataReport[j][picStartIndex + 1].ResultReport);
       picSetData.push(dataReport[j][picStartIndex + 2].ResultReport);
 
-      for (i = picStartIndex + 3; i < dataReport[j].length; i) {
+      //1 row = 3 record , stop when remain record not complete
+      for (i = picStartIndex + 3; i + 2 < dataReport[j].length; i) {
         dataInTable.push([
           {
             content: dataReport[j][i].ItemReportName,
@@ -718,15 +720,16 @@ async function PicSetAPM(dataReport, CurrentRound, doc, currentY) {
       didDrawCell: function (data) {
         if (
           data.section === "body" &&
-          data.row.index % 2 === 0 &&
-          data.column.index >= 1
+          data.column.index >= 1 &&
+          picRowRound[data.row.index] !== undefined
         ) {
-
+          //3 picture per round , column 1-3
+          let picIndex =
+            picRowRound[data.row.index] * 3 + (data.column.index - 1);
           try {
             let bitmap = fs.readFileSync(
-              "C:\\AutomationProject\\SAR\\asset\\" + picSetData[runningPic]
+              "C:\\AutomationProject\\SAR\\asset\\" + picSetData[picIndex]
             );
-            runningPic++;
             doc.addImage(
               bitmap.toString("base64"),
               "jpg",
@@ -736,7 +739,6 @@ async function PicSetAPM(dataReport, CurrentRound, doc, currentY) {
               picHeight - 2
             );
           } catch (err) {
-            runningPic++;
             console.log("error pic" + err);
           }
         }
