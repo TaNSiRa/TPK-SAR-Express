@@ -7,6 +7,7 @@ require("./asset/THSarabun Bold-bold.js");
 router.use(require("./flow/01MainPage/MainPage"));
 router.use(require("./flow/20widget/HistoryDataExcel"));
 router.use(require("./flow/20widget/ShowPicture"));
+router.use(require("./flow/20widget/CrystalSizeHondaPicture"));
 router.use(require("./flow/test"));
 router.use(require("./flow/31RequestDetailRequester/KAC_Report/KAC_Report"));
 router.use(require("./flow/31RequestDetailRequester/RoutineRequestDetailRequesterPage/RoutineRequestDetailRequesterPage"));
