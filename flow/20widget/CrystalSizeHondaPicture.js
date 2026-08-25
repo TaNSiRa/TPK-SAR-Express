@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 // รูปของ Crystal size (Honda) เก็บแยก folder ใน asset root
-const ASSET_ROOT = "C:\AutomationProject\SAR\asset";
+const ASSET_ROOT = "C:\\AutomationProject\\SAR\\asset";
 const PIC_FOLDER = "pic_crystalsize_honda";
 const PIC_DIR = path.join(ASSET_ROOT, PIC_FOLDER);
 
