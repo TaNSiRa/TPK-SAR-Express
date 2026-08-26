@@ -699,7 +699,7 @@ async function PicSetAPM(dataReport, CurrentRound, doc, currentY) {
 }
 
 function checkFontSize(name) {
-  if (name == "Coating weight (g/m2)") {
+  if (String(name).trim().toLowerCase() == "coating weight (g/m2)") {
     return 10;
   } else {
     return 13;
