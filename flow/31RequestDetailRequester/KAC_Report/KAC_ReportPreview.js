@@ -27,6 +27,14 @@ function sqlEscape(value) {
   return safe(value).replace(/'/g, "''");
 }
 
+// ดึงข้อความ error ที่อ่านรู้เรื่องออกมาจาก error object / ค่าอะไรก็ตาม
+function errText(value) {
+  if (value === null || value === undefined) return "no result";
+  if (value instanceof Error) return value.message || String(value);
+  if (typeof value === "object" && value.message) return String(value.message);
+  return String(value);
+}
+
 function reportOrderValue(value) {
   const num = parseFloat(safe(value));
   return isNaN(num) ? null : num;
@@ -100,17 +108,16 @@ function buildPreviewRow(row, source, header) {
   };
 }
 
-router.post("/KACReportData_PreviewMasterReport", async (req, res) => {
-  console.log("in _PreviewMasterReport");
-  try {
-    const custShort = safe(req.body.CustShort);
-    const custFullIn = safe(req.body.CustFull);
+// สร้างชุดข้อมูล report จำลองจาก master pattern (แยกออกมาเพื่อให้เทสได้)
+async function buildPreviewData(custShortIn, custFullIn2) {
+  const custShort = safe(custShortIn);
+  const custFullIn = safe(custFullIn2);
 
-    if (custShort === "" && custFullIn === "") {
-      return res.send("ERROR");
-    }
+  if (custShort === "" && custFullIn === "") {
+    return { error: "ไม่ได้ระบุลูกค้า" };
+  }
 
-    const whereCust =
+  const whereCust =
       custShort !== ""
         ? `CustShort = N'${sqlEscape(custShort)}'`
         : `CustFull = N'${sqlEscape(custFullIn)}'`;
@@ -118,16 +125,24 @@ router.post("/KACReportData_PreviewMasterReport", async (req, res) => {
     const dbTS = await mssql.qurey(
       `select * from [SAR].[dbo].[Routine_MasterPatternTS] where ${whereCust} order by ReportOrder asc;`
     );
+    // ถ้า query พัง mssql.qurey จะคืน error object (ไม่มี recordset)
+    // ต้องแยกให้ออกจากกรณี "ไม่มีข้อมูล" ไม่งั้นจะเข้าใจผิดว่าลูกค้าไม่มีข้อมูล
+    if (!dbTS || !dbTS.recordset) {
+      return { error: "อ่าน Routine_MasterPatternTS ไม่สำเร็จ : " + errText(dbTS) };
+    }
     const dbLab = await mssql.qurey(
       `select * from [SAR].[dbo].[Routine_MasterPatternLab] where ${whereCust} order by ReportOrder asc;`
     );
+    if (!dbLab || !dbLab.recordset) {
+      return { error: "อ่าน Routine_MasterPatternLab ไม่สำเร็จ : " + errText(dbLab) };
+    }
 
     const rowsTS = (dbTS.recordset || []).filter(isReportRow);
     const rowsLab = (dbLab.recordset || []).filter(isReportRow);
 
     if (rowsTS.length === 0 && rowsLab.length === 0) {
       console.log("PreviewMasterReport : no report row (ReportOrder != 0)");
-      return res.send("NODATA");
+      return { noData: true };
     }
 
     const allMasterTS = dbTS.recordset || [];
@@ -191,20 +206,62 @@ router.post("/KACReportData_PreviewMasterReport", async (req, res) => {
 
     dataReport = await createReport.ReplaceItemName(dataReport);
 
-    masterDoc.setReqNo(header.ReqNo);
-    masterDocYearly.setReqNo(header.ReqNo);
+  return { dataReport: dataReport, reqNo: header.ReqNo, custFull: header.CustFull };
+}
 
-    const pdf = await createpdf.SelectPattern(dataReport);
+// pattern บางแบบ (รายงานรายปี / มีกราฟย้อนหลัง เช่น Y2TM, BCM, MMTHNEW)
+// ไม่ได้สร้างตารางจาก dataReport ที่ส่งเข้าไป แต่ไป query ประวัติจาก Routine_KACReport เอง
+// ถ้าลูกค้ายังไม่มีประวัติของปีปัจจุบัน pattern พวกนี้จะพังเพราะ array ว่าง
+// ใช้ตรวจเพื่อบอกสาเหตุให้ผู้ใช้เข้าใจ แทนที่จะขึ้น error ดิบ ๆ
+async function countHistoryThisYear(custFull) {
+  try {
+    const db = await mssql.qurey(
+      `select count(*) as c from [SAR].[dbo].[Routine_KACReport]
+       where CustFull = N'${sqlEscape(custFull)}' and YEAR(SamplingDate) = YEAR(GETDATE());`
+    );
+    if (!db || !db.recordset || db.recordset.length === 0) return -1;
+    return db.recordset[0].c;
+  } catch (err) {
+    return -1;
+  }
+}
+
+router.post("/KACReportData_PreviewMasterReport", async (req, res) => {
+  console.log("in _PreviewMasterReport");
+  try {
+    const built = await buildPreviewData(req.body.CustShort, req.body.CustFull);
+    if (built.noData) return res.send("NODATA");
+    if (built.error) {
+      console.log("PreviewMasterReport : " + built.error);
+      return res.send("ERROR: " + built.error);
+    }
+
+    const pattern = built.dataReport[0].PatternReport || "K1 (default)";
+    console.log(
+      `PreviewMasterReport : ${built.reqNo} | pattern = ${pattern} | rows = ${built.dataReport.length}`
+    );
+
+    masterDoc.setReqNo(built.reqNo);
+    masterDocYearly.setReqNo(built.reqNo);
+
+    const pdf = await createpdf.SelectPattern(built.dataReport);
     if (typeof pdf !== "string") {
       console.log("PreviewMasterReport : create pdf failed");
       console.log(pdf);
-      return res.send("ERROR");
+      const history = await countHistoryThisYear(built.custFull);
+      const hint =
+        history === 0
+          ? `\npattern '${pattern}' สร้าง report จากประวัติใน Routine_KACReport ของปีปัจจุบัน` +
+            `\nแต่ลูกค้ารายนี้ยังไม่มีข้อมูลของปีนี้ จึงยัง preview ไม่ได้`
+          : "";
+      return res.send(`ERROR: สร้าง PDF pattern '${pattern}' ไม่สำเร็จ${hint}\n${errText(pdf)}`);
     }
     return res.send(pdf);
   } catch (error) {
     console.log(error);
-    return res.send("ERROR");
+    return res.send("ERROR: " + errText(error));
   }
 });
 
 module.exports = router;
+module.exports.buildPreviewData = buildPreviewData;
