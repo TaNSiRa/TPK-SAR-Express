@@ -40,6 +40,45 @@ function reportOrderValue(value) {
   return isNaN(num) ? null : num;
 }
 
+// Routine_KACReport เก็บ ReportOrder / SampleNo / ItemNo เป็น int
+// pattern บางตัวเทียบด้วย === (เช่น ReportOrder === 101, 105, 106 ของบล็อครูป)
+// ถ้าส่งเป็น string จะไม่ match แล้วแถวนั้นจะหายไปจาก report
+function numValue(value, fallback) {
+  const num = parseFloat(safe(value));
+  return isNaN(num) ? fallback : num;
+}
+
+const EMPTY_COMMENTS = {
+  Comment1: "", Comment2: "", Comment3: "", Comment4: "", Comment5: "",
+  Comment6: "", Comment7: "", Comment8: "", Comment9: "", Comment10: "",
+};
+
+// comment ไม่ได้อยู่ใน master (คนกรอกตอนสร้าง report จริง)
+// preview จึงหยิบ comment ของ report ล่าสุดของลูกค้ารายนั้นมาแสดง
+// เพื่อให้หน้าตา report ตัวอย่างเหมือนของจริง
+async function loadLatestComments(custFull) {
+  if (safe(custFull) === "") return EMPTY_COMMENTS;
+  try {
+    const db = await mssql.qurey(
+      `select top 1 Comment1, Comment2, Comment3, Comment4, Comment5,
+              Comment6, Comment7, Comment8, Comment9, Comment10
+       from [SAR].[dbo].[Routine_KACReport]
+       where CustFull = N'${sqlEscape(custFull)}'
+       order by CreateReportDate desc;`
+    );
+    if (!db || !db.recordset || db.recordset.length === 0) return EMPTY_COMMENTS;
+    const found = db.recordset[0];
+    const out = {};
+    Object.keys(EMPTY_COMMENTS).forEach((key) => {
+      out[key] = safe(found[key]);
+    });
+    return out;
+  } catch (err) {
+    console.log("PreviewMasterReport : โหลด comment ล่าสุดไม่สำเร็จ", err);
+    return EMPTY_COMMENTS;
+  }
+}
+
 function isReportRow(row) {
   const order = reportOrderValue(row.ReportOrder);
   return order !== null && order !== 0;
@@ -60,8 +99,8 @@ function buildPreviewRow(row, source, header) {
     ReqNo: header.ReqNo,
     CustFull: header.CustFull,
     PatternReport: header.PatternReport,
-    ReportOrder: safe(row.ReportOrder),
-    SampleNo: safe(row.SampleNo),
+    ReportOrder: numValue(row.ReportOrder, 0),
+    SampleNo: numValue(row.SampleNo, 0),
     GroupNameTS: safe(row.GroupNameTS),
     SampleGroup: safe(row.SampleGroup),
     SampleType: safe(row.SampleType),
@@ -70,7 +109,7 @@ function buildPreviewRow(row, source, header) {
     ProcessReportName: safe(row.ProcessReportName),
     SamplingDate: header.SamplingDate,
     CreateReportDate: header.CreateReportDate,
-    ItemNo: safe(row.ItemNo),
+    ItemNo: numValue(row.ItemNo, 0),
     ItemName: safe(row.ItemName),
     ItemReportName: safe(row.ItemReportName),
     StdFactor: safe(row.StdFactor),
@@ -84,25 +123,17 @@ function buildPreviewRow(row, source, header) {
     Evaluation: "-",
     Incharge: header.Incharge,
     SubLeader: header.SubLeader,
-    SubLeaderTime: "",
+    SubLeaderTime: null,
     GL: header.GL,
-    GLTime: "",
+    GLTime: null,
     JP: header.JP,
-    JPTime: "",
+    JPTime: null,
     DGM: header.DGM,
-    DGMTime: "",
-    ReportCompleteDate: "",
+    DGMTime: null,
+    InchargeTime: null,
+    ReportCompleteDate: null,
     NextApprover: "",
-    Comment1: "",
-    Comment2: "",
-    Comment3: "",
-    Comment4: "",
-    Comment5: "",
-    Comment6: "",
-    Comment7: "",
-    Comment8: "",
-    Comment9: "",
-    Comment10: "",
+    ...header.comments,
     ReviseNo: 0,
     SourceTable: source,
   };
@@ -148,23 +179,25 @@ async function buildPreviewData(custShortIn, custFullIn2) {
     const allMasterTS = dbTS.recordset || [];
     const allMasterLab = dbLab.recordset || [];
 
-    // report ใช้ getUTC* ในการอ่านวันที่ จึงส่งเป็นเที่ยงคืน UTC ของวันนี้
-    // เพื่อให้แสดงวันที่ตรงกับวันปัจจุบัน
+    // Routine_KACReport เก็บวันที่เป็น datetime (อ่านออกมาเป็น Date object)
+    // และ report อ่านค่าด้วย getUTC* จึงใช้เที่ยงคืน UTC ของวันนี้
     const today = new Date();
-    const pad = (n) => String(n).padStart(2, "0");
-    const now =
-      `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}` +
-      "T00:00:00.000Z";
+    const now = new Date(
+      Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())
+    );
+
+    const custFullFound =
+      firstFilled(allMasterTS, "CustFull") ||
+      firstFilled(allMasterLab, "CustFull") ||
+      custFullIn;
 
     const header = {
+      comments: await loadLatestComments(custFullFound),
       // ReqNo ปลอมสำหรับ preview เท่านั้น (กันไปทับไฟล์ report ของจริง)
       ReqNo:
         "PREVIEW-" +
         (custShort !== "" ? custShort : custFullIn).replace(/[^A-Za-z0-9_-]/g, "_"),
-      CustFull:
-        firstFilled(allMasterTS, "CustFull") ||
-        firstFilled(allMasterLab, "CustFull") ||
-        custFullIn,
+      CustFull: custFullFound,
       PatternReport: firstFilled(allMasterTS, "PatternReport"),
       SamplingDate: now,
       CreateReportDate: now,
