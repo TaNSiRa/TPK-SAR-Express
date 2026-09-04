@@ -744,6 +744,190 @@ exports.PicSetforATT = async (dataReport, doc, currentY) => {
   }
 };
 
+// KOWOO : ใช้หัวตาราง MATERIAL / CHECK ITEM / RESULT ชุดเดียว แล้วเอา item ของทุกชุดมาต่อกัน
+// PicSetforATT จะ autoTable แยกหนึ่งครั้งต่อหนึ่งชุด หัวตารางเลยซ้ำทุกชุด
+// แยกฟังก์ชันไว้ต่างหากเพื่อไม่ให้กระทบ ATSUMITEC ที่ต้องได้รูปแบบเดิมทุกอย่าง
+exports.PicSetforKOWOO = async (dataReport, doc, currentY) => {
+  try {
+    console.log("PicSetforKOWOO");
+    var picHeight = 55;
+    var picWidht = 90;
+
+    var rows = [];
+    for (let i = 0; i < dataReport.length; i++) {
+      if (dataReport[i].ReportOrder > 100) {
+        rows.push(dataReport[i]);
+      }
+    }
+    if (rows.length == 0) {
+      return [doc, currentY];
+    }
+
+    doc.autoTable({
+      startY: currentY + 4,
+      head: [
+        [
+          {
+            content: "Quality of PULS film",
+            styles: {
+              textColor: 0,
+              halign: "center",
+              valign: "middle",
+              fillColor: [3, 244, 252],
+              font: "THSarabun",
+              fontStyle: "bold",
+              fontSize: 12,
+              cellPadding: 1,
+              lineColor: 0,
+              lineWidth: 0.1,
+              maxCellHeight: 12,
+              cellWidth: 50,
+            },
+          },
+        ],
+      ],
+      //body: body,
+      theme: "grid",
+    });
+    currentY = doc.lastAutoTable.finalY;
+
+    // จัดกลุ่มตามชุด : 101-105 = ชุดที่ 1, 111-115 = ชุดที่ 2 ...
+    // MATERIAL ของแต่ละชุด rowSpan คลุมทุกแถวในชุดนั้น
+    var sets = [];
+    var setSlot = {};
+    for (let i = 0; i < rows.length; i++) {
+      var setNo = Math.floor((rows[i].ReportOrder - 101) / 10);
+      if (setSlot[setNo] === undefined) {
+        setSlot[setNo] = sets.length;
+        sets.push([]);
+      }
+      sets[setSlot[setNo]].push(rows[i]);
+    }
+
+    // หัวตารางมี 3 ช่อง จึง push แค่ 3 ค่าต่อแถว ให้ค่าลงตรงกับหัวจริง ๆ
+    //   MATERIAL = ProcessReportName / CHECK ITEM = ControlRange / RESULT = ResultReport
+    // ATT push 5 ค่าทั้งที่หัวตารางเหลือ 3 (CONTROLED RANGE กับ EVALUATION ถูก comment ทิ้ง)
+    // autotable เลยตัด 2 ค่าท้ายออก ทำให้ ControlRange เลื่อนไปโผล่ใต้หัว RESULT
+    var dataInTable = [];
+    var dataBuff = [];
+    var picRows = {}; // index ของแถวรูป -> ข้อมูลของแถวนั้น (ไว้ใช้ตอนวาดรูป)
+    for (let s = 0; s < sets.length; s++) {
+      var setRows = sets[s];
+      for (let j = 0; j < setRows.length; j++) {
+        var row = setRows[j];
+        var cells = [];
+        if (j == 0) {
+          cells.push({
+            rowSpan: setRows.length,
+            content: row.ProcessReportName,
+          });
+        }
+        cells.push(row.ControlRange);
+        if ((row.ReportOrder - 105) % 10 == 0) {
+          // แถวรูป : เว้นช่อง RESULT ให้สูงพอวางรูป แล้วไปวาดจริงใน didDrawCell
+          picRows[dataInTable.length] = row;
+          cells.push({
+            content: "",
+            styles: {
+              valign: "middle",
+              halign: "center",
+              minCellHeight: picHeight,
+            },
+          });
+        } else {
+          cells.push(row.ResultReport);
+        }
+        dataInTable.push(cells);
+        dataBuff.push(row);
+      }
+    }
+
+    doc.autoTable({
+      startY: currentY + 4,
+      head: [["MATERIAL", "CHECK ITEM", "RESULT"]],
+      headStyles: {
+        textColor: 0,
+        halign: "center",
+        valign: "middle",
+        fillColor: [140, 255, 219],
+        font: "THSarabun",
+        fontStyle: "bold",
+        fontSize: 15,
+        cellPadding: 1,
+        lineColor: 0,
+        lineWidth: 0.1,
+        minCellHeight: 10,
+        maxCellHeight: 12,
+      },
+      body: dataInTable,
+      bodyStyles: {
+        textColor: 0,
+        halign: "center",
+        valign: "middle",
+        fillColor: [255, 255, 255],
+        font: "THSarabun",
+        fontStyle: "normal",
+        fontSize: 13,
+        cellPadding: 1,
+        lineColor: 0,
+        lineWidth: 0.1,
+        maxCellHeight: 11,
+      },
+      columnStyles: {
+        0: { cellWidth: 35 },
+        1: { cellWidth: 35 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 30 },
+      },
+      allSectionHooks: true,
+      willDrawCell: function (data) {
+        // ระบายแดงช่อง RESULT เมื่อผลไม่ผ่าน
+        // ATT ตั้งใจทำเหมือนกันแต่ไปเช็คคอลัมน์ 3/4 ซึ่งหัวตารางเหลือ 3 ช่องแล้วไม่มีจริง
+        if (data.column.index === 2 && data.section === "body") {
+          var src = dataBuff[data.row.index];
+          if (
+            src &&
+            (src.Evaluation == "LOW" ||
+              src.Evaluation == "HIGH" ||
+              src.Evaluation == "NOT PASS" ||
+              src.Evaluation == "NG")
+          ) {
+            doc.setTextColor(231, 76, 60); // Red
+          }
+        }
+      },
+      didDrawCell: function (data) {
+        var picRow = picRows[data.row.index];
+        if (picRow && data.column.index == 2) {
+          try {
+            let bitmap = fs.readFileSync(
+              "C:\\AutomationProject\\SAR\\asset\\" + picRow.ResultReport
+            );
+            doc.addImage(
+              bitmap.toString("base64"),
+              "jpg",
+              data.cell.x + 1,
+              data.cell.y + 1,
+              picWidht - 2,
+              picHeight - 2
+            );
+          } catch (err) {
+            console.log("error pic" + err);
+          }
+        }
+      },
+
+      theme: "grid",
+    });
+
+    currentY = doc.lastAutoTable.finalY;
+    return [doc, currentY];
+  } catch (err) {
+    throw err;
+  }
+};
+
 exports.PicSetforNHK = async (dataReport, doc, currentY) => {
   try {
     console.log("PicSet");

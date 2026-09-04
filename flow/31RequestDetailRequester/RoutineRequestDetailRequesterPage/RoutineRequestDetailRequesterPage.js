@@ -90,15 +90,26 @@ router.post(
 
       if (checkComplete) {
         console.log("create report");
-        for (let i = 0; i < 3; i++) {
-          var report = await createReport.CreateReport(dataIn[0].ReqNo);
-          const stringLength = report.length;
-          const sizeInBytes = stringLength * (3 / 4) - 2;
-          const sizeInKb = sizeInBytes / 1000;
-          console.log(sizeInKb);
-          if (sizeInKb < 2000) {
-            break;
+        // ตั้งใจไม่ให้ report ที่สร้างไม่ผ่านมาบล็อกการปิดงาน
+        // (สร้างใหม่ได้จากหน้า detail) แต่ต้อง log ให้เห็นว่าพังเพราะอะไร
+        try {
+          for (let i = 0; i < 3; i++) {
+            var report = await createReport.CreateReport(dataIn[0].ReqNo);
+            const stringLength = report.length;
+            const sizeInBytes = stringLength * (3 / 4) - 2;
+            const sizeInKb = sizeInBytes / 1000;
+            console.log(sizeInKb);
+            if (sizeInKb < 2000) {
+              break;
+            }
           }
+        } catch (err) {
+          console.error(
+            "[RequesterPage] สร้าง report ของ " +
+              dataIn[0].ReqNo +
+              " ไม่สำเร็จ : " +
+              (err instanceof Error ? err.message : String(err))
+          );
         }
         await nodemailer.MKTSendCompleteReport(
           dataIn[0].ReqNo,

@@ -224,8 +224,11 @@ router.post("/KACReportData_saveKACReportData", async (req, res) => {
     }
     res.send(report);
   } catch (error) {
-    console.log(error);
-    res.json("ERROR");
+    // ตอบ 500 เพื่อให้ client รู้ว่านี่ไม่ใช่ base64 ของ PDF
+    // (เดิมตอบ 200 พร้อมข้อความ client เอาไป decode ต่อจนพังเป็น FormatException)
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("[saveKACReportData] " + message);
+    res.status(500).json("ERROR: " + message);
   }
 });
 
@@ -354,8 +357,11 @@ router.post("/KACReportData_createKACReport", async (req, res) => {
     }
     res.send(report);
   } catch (error) {
-    console.log(error);
-    res.json("ERROR");
+    // ตอบ 500 เพื่อให้ client รู้ว่านี่ไม่ใช่ base64 ของ PDF
+    // (เดิมตอบ 200 พร้อมข้อความ client เอาไป decode ต่อจนพังเป็น FormatException)
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("[createKACReport] " + message);
+    res.status(500).json("ERROR: " + message);
   }
 });
 
@@ -427,8 +433,11 @@ router.post("/KACReportData_reviseKACReport", async (req, res) => {
 
     res.send(report);
   } catch (error) {
-    console.log(error);
-    res.json("ERROR");
+    // ตอบ 500 เพื่อให้ client รู้ว่านี่ไม่ใช่ base64 ของ PDF
+    // (เดิมตอบ 200 พร้อมข้อความ client เอาไป decode ต่อจนพังเป็น FormatException)
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("[reviseKACReport] " + message);
+    res.status(500).json("ERROR: " + message);
   }
 });
 
@@ -479,9 +488,12 @@ router.post("/KACReportData_LoadReport", async (req, res) => {
     var pdf = await createpdf.SelectPattern(dataReport);
     res.send(pdf); */
   } catch (error) {
-    console.log(error);
-    res.send("ERROR");
-    return error;
+    // CreateReport จะ throw พร้อมเหตุผลแล้ว ส่งต่อให้ client เห็นว่าพังเพราะอะไร
+    // ห้าม res.send(errorObject) เด็ดขาด เพราะ Express จะ serialize Error เป็น {}
+    // แล้ว base64Decode ฝั่ง Flutter จะโยน FormatException ที่ไล่หาต้นตอไม่ได้
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("[LoadReport] " + req.body.ReqNo + " : " + message);
+    res.status(500).send("ERROR: " + message);
   }
 });
 

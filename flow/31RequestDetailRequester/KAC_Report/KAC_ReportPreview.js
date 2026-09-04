@@ -277,7 +277,14 @@ router.post("/KACReportData_PreviewMasterReport", async (req, res) => {
     masterDoc.setReqNo(built.reqNo);
     masterDocYearly.setReqNo(built.reqNo);
 
-    const pdf = await createpdf.SelectPattern(built.dataReport);
+    let pdf;
+    try {
+      pdf = await createpdf.SelectPattern(built.dataReport);
+    } catch (err) {
+      // ตอนนี้ pattern จะ throw แทนที่จะคืน Error object
+      // รับไว้ตรงนี้เพื่อให้สรุปสาเหตุพร้อม hint ด้านล่างทำงานเหมือนเดิม
+      pdf = err;
+    }
     if (typeof pdf !== "string") {
       console.log("PreviewMasterReport : create pdf failed");
       console.log(pdf);

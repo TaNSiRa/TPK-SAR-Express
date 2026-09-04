@@ -14,6 +14,26 @@ const THSarabunNewl = require("../../../../asset/THSarabun Italic-italic.js");
 const THSarabunNewb = require("../../../../asset/THSarabun Bold-bold.js");
 const THSarabunNewll = require("../../../../asset/THSarabun Bold Italic-italic.js"); */
 
+// pattern ATT ผูกกราฟไว้กับ "ตำแหน่งแถว" (index) คงที่ของข้อมูลแต่ละรอบ
+// ลูกค้าที่มีจำนวนไอเทมไม่เท่ากับที่ pattern ออกแบบไว้จะไม่มีแถวนั้น
+// ตัวช่วยนี้คัดเฉพาะ index ที่มีข้อมูลครบทุกรอบ เพื่อข้ามเฉพาะกราฟที่ขาดข้อมูล
+// แทนที่จะทำให้ทั้งรายงานพัง -- ถ้าข้อมูลครบ จะคืน index เดิมทั้งหมด report จึงออกเหมือนเดิมทุกประการ
+function availableGraphIndex(dataRounds, indexGraph, graphName) {
+  return indexGraph.filter((idx) => {
+    for (let i = 0; i < dataRounds.length; i++) {
+      if (!dataRounds[i] || !dataRounds[i][idx]) {
+        console.warn(
+          '[Pattern_ATT] ข้ามกราฟ "' + graphName + '" : ไม่มีข้อมูล index ' + idx +
+          ' ในรอบที่ ' + (i + 1) +
+          ' (รอบนั้นมี ' + (dataRounds[i] ? dataRounds[i].length : 0) + ' แถว)'
+        );
+        return false;
+      }
+    }
+    return true;
+  });
+}
+
 exports.CreatePDF = async (dataReport) => {
   try {
     var CustFull = dataReport[0].CustFull;
@@ -138,13 +158,23 @@ exports.CreatePDF = async (dataReport) => {
     //doc.output("dataurlstring", "name");
     return bitmap.toString("base64");
   } catch (err) {
-    console.log(err);
-    return err;
+    console.error(
+      "[Pattern_ATT] สร้างรายงาน " +
+        (dataReport && dataReport[0] ? dataReport[0].ReqNo : "(unknown)") +
+        " ไม่สำเร็จ :",
+      err
+    );
+    throw err;
   }
 };
 
 async function SetGraph(dataReport, doc, indexGraph, xPosition) {
   try {
+    indexGraph = availableGraphIndex(dataReport, indexGraph, "Electro Conductivity");
+    if (indexGraph.length === 0) {
+      return [doc, doc.lastAutoTable ? doc.lastAutoTable.finalY + 4 : 15];
+    }
+
     doc.autoTable({
       startY: 15,
       head: [
@@ -280,8 +310,7 @@ async function SetGraph(dataReport, doc, indexGraph, xPosition) {
 
     return [doc, currentY];
   } catch (err) {
-    console.log(err);
-    return err;
+    throw err;
   }
 }
 
@@ -379,13 +408,17 @@ async function GraphPic(dataReport, indexData) {
     var base64Data = base64Image.replace(/^data:image\/png;base64,/, "");
     return base64Data;
   } catch (err) {
-    console.log(err);
-    return err;
+    throw err;
   }
 }
 
 async function SetGraph1(dataReport, doc, indexGraph, xPosition) {
   try {
+    indexGraph = availableGraphIndex(dataReport, indexGraph, "Non-Volatile Content");
+    if (indexGraph.length === 0) {
+      return [doc, doc.lastAutoTable ? doc.lastAutoTable.finalY + 4 : 15];
+    }
+
     doc.autoTable({
       startY: 15,
       head: [
@@ -521,8 +554,7 @@ async function SetGraph1(dataReport, doc, indexGraph, xPosition) {
 
     return [doc, currentY];
   } catch (err) {
-    console.log(err);
-    return err;
+    throw err;
   }
 }
 
@@ -620,13 +652,17 @@ async function GraphPic1(dataReport, indexData) {
     var base64Data = base64Image.replace(/^data:image\/png;base64,/, "");
     return base64Data;
   } catch (err) {
-    console.log(err);
-    return err;
+    throw err;
   }
 }
 
 async function SetGraph2(dataReport, doc, indexGraph, xPosition) {
   try {
+    indexGraph = availableGraphIndex(dataReport, indexGraph, "Coating Weight");
+    if (indexGraph.length === 0) {
+      return [doc, doc.lastAutoTable ? doc.lastAutoTable.finalY + 4 : 15];
+    }
+
     doc.autoTable({
       startY: 15,
       head: [
@@ -762,8 +798,7 @@ async function SetGraph2(dataReport, doc, indexGraph, xPosition) {
 
     return [doc, currentY];
   } catch (err) {
-    console.log(err);
-    return err;
+    throw err;
   }
 }
 
@@ -861,13 +896,17 @@ async function GraphPic2(dataReport, indexData) {
     var base64Data = base64Image.replace(/^data:image\/png;base64,/, "");
     return base64Data;
   } catch (err) {
-    console.log(err);
-    return err;
+    throw err;
   }
 }
 
 async function SetGraph3(dataReport, doc, indexGraph, xPosition) {
   try {
+    indexGraph = availableGraphIndex(dataReport, indexGraph, "%N.V. Calibration");
+    if (indexGraph.length === 0) {
+      return [doc, doc.lastAutoTable ? doc.lastAutoTable.finalY + 4 : 15];
+    }
+
     doc.autoTable({
       startY: 15,
       head: [
@@ -1003,8 +1042,7 @@ async function SetGraph3(dataReport, doc, indexGraph, xPosition) {
 
     return [doc, currentY];
   } catch (err) {
-    console.log(err);
-    return err;
+    throw err;
   }
 }
 
@@ -1102,7 +1140,6 @@ async function GraphPic3(dataReport, indexData) {
     var base64Data = base64Image.replace(/^data:image\/png;base64,/, "");
     return base64Data;
   } catch (err) {
-    console.log(err);
-    return err;
+    throw err;
   }
 }
