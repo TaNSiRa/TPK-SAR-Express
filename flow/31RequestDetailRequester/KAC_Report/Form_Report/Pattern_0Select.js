@@ -54,6 +54,7 @@ const Pattern_THACOM = require("./Pattern_THACOM.js");
 const Pattern_DAIKINAC131 = require("./Pattern_DAIKINAC131.js");
 const Pattern_K1NANO = require("./Pattern_K1NANO.js");
 const Pattern_KOWOO = require("./Pattern_KOWOO.js");
+const Pattern_YASUNAGA = require("./Pattern_YASUNAGA.js");
 
 exports.SelectPattern = async (dataReport) => {
   try {
@@ -180,6 +181,8 @@ exports.SelectPattern = async (dataReport) => {
       var data = await Pattern_K1NANO.CreatePDF(dataReport);
     } else if (dataReport[0].PatternReport == "KOWOO") {
       var data = await Pattern_KOWOO.CreatePDF(dataReport);
+    } else if (dataReport[0].PatternReport == "YASUNAGA") {
+      var data = await Pattern_YASUNAGA.CreatePDF(dataReport);
     } else {
       {
         console.log("K1");
@@ -189,10 +192,10 @@ exports.SelectPattern = async (dataReport) => {
     if (typeof data !== "string" || data.length === 0) {
       throw new Error(
         "pattern '" +
-          (dataReport[0].PatternReport || "K1 (default)") +
-          "' ไม่ได้คืนค่าเป็น base64 (ได้ " +
-          (data === null || data === undefined ? String(data) : typeof data) +
-          ")"
+        (dataReport[0].PatternReport || "K1 (default)") +
+        "' ไม่ได้คืนค่าเป็น base64 (ได้ " +
+        (data === null || data === undefined ? String(data) : typeof data) +
+        ")"
       );
     }
     return data;

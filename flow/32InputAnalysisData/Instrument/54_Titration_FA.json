@@ -1,0 +1,502 @@
+[
+ {
+  "id": "54fa000000000001",
+  "type": "comment",
+  "name": "54_Titration F.A.",
+  "info": "",
+  "x": 140,
+  "y": 3030,
+  "wires": [],
+  "z": "4a603a04.1f0f84"
+ },
+ {
+  "id": "54fa000000000002",
+  "type": "http response",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "statusCode": "",
+  "headers": {},
+  "x": 1150,
+  "y": 3090,
+  "wires": []
+ },
+ {
+  "id": "54fa000000000003",
+  "type": "function",
+  "z": "4a603a04.1f0f84",
+  "name": "Check error",
+  "func": "\nif(msg.error !== undefined)\n{\n    msg.payload = \"error\";\n}\n\nreturn msg;\n\n\n",
+  "outputs": 1,
+  "timeout": "",
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 1010,
+  "y": 3090,
+  "wires": [
+   [
+    "54fa000000000002"
+   ]
+  ]
+ },
+ {
+  "id": "54fa000000000004",
+  "type": "debug",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "active": false,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": false,
+  "complete": "true",
+  "statusVal": "",
+  "statusType": "auto",
+  "x": 1150,
+  "y": 3050,
+  "wires": [],
+  "targetType": "full"
+ },
+ {
+  "id": "54fa000000000005",
+  "type": "MSSQL",
+  "z": "4a603a04.1f0f84",
+  "mssqlCN": "427eb354.094c8c",
+  "name": "",
+  "outField": "payload",
+  "returnType": "0",
+  "throwErrors": "0",
+  "query": "",
+  "modeOpt": "",
+  "modeOptType": "query",
+  "queryOpt": "payload",
+  "queryOptType": "msg",
+  "paramsOpt": "",
+  "paramsOptType": "none",
+  "rows": "rows",
+  "rowsType": "msg",
+  "params": [],
+  "x": 820,
+  "y": 3090,
+  "wires": [
+   [
+    "54fa000000000004",
+    "54fa000000000003"
+   ]
+  ]
+ },
+ {
+  "id": "54fa000000000006",
+  "type": "debug",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "active": false,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": false,
+  "complete": "false",
+  "statusVal": "",
+  "statusType": "auto",
+  "x": 810,
+  "y": 3050,
+  "wires": []
+ },
+ {
+  "id": "54fa000000000007",
+  "type": "function",
+  "z": "4a603a04.1f0f84",
+  "name": "Query",
+  "func": "var itemStatus = \"\";\nif(msg.payload.SearchOption.List === true &&msg.payload.SearchOption.Finish === false)\n{\n   itemStatus = `and Mdata.itemStatus in ('LIST NORMAL','LIST RECHECK','LIST RECONFIRM')`;\n}\nelse if(msg.payload.SearchOption.List === false &&msg.payload.SearchOption.Finish === true)\n{\n  itemStatus= `and Mdata.itemStatus in ('FINISH NORMAL','FINISH RECHECK','FINISH RECONFIRM')`;\n}\nelse\n{\n   itemStatus = `and Mdata.itemStatus in ('LIST NORMAL','FINISH NORMAL','LIST RECHECK','FINISH RECHECK','LIST RECONFIRM','FINISH RECONFIRM')`;\n}\nmsg.payload = `select\nMdata.[ID] as RequestSample_ID,\nMdata.[ReqNo],\nMdata.[JobType],\nMdata.[Incharge],\nMdata.[Branch],\nMdata.[RequestSection],\nMdata.[ReqDate],\nMdata.[CustFull],\nMdata.[SampleCode],\nMdata.[SampleGroup],\nMdata.[SampleType],\nMdata.[SampleTank],\nMdata.[SampleName],\nMdata.[SamplingDate],\nMdata.[AnalysisDueDate],\nMdata.[SampleRemark],\nMdata.[SampleAttachFile],\nMdata.[Position],\nMdata.[Mag],\nMdata.[Temp],\nMdata.[StdFactor],\nMdata.[StdMaxL] as StdMax,\nMdata.[StdMinL] as StdMin,\nMdata.[ItemNo],\nMdata.[ItemName],\nMdata.[RemarkNo],\nMdata.[ItemStatus],\nIdata.[UserAnalysis],\nIdata.[UserAnalysisBranch],\nIdata.[AnalysisDate],\nIdata.[ResultSymbol_1],\nIdata.[Result_1],\nIdata.[ResultUnit_1],\nIdata.[ResultRemark_1],\nIdata.[ResultFile_1],\nIdata.[ResultSymbol_2],\nIdata.[Result_2],\nIdata.[ResultUnit_2],\nIdata.[ResultRemark_2],\nIdata.[ResultFile_2]\nFROM Routine_RequestLab as Mdata\nLEFT JOIN  Instrument_FA as Idata\nON Idata.[RequestSample_ID] = Mdata.ID\nand Idata.[ItemStatus] = Mdata.[ItemStatus]\nwhere Mdata.[userListAnalysis] = '${msg.payload.UserName}'\n${itemStatus}\nand Mdata.Instrumentname = '${msg.payload.InstrumentName}'\nand Mdata.RemarkNo like '%${msg.payload.SearchOption.RemarkNo}%'\nand Mdata.SampleCode like '%${msg.payload.SearchOption.SampleCode}%'\norder by Mdata.remarkNO asc,Mdata.ReqNo asc,Mdata.SampleNo asc,Mdata.ItemNo asc;`\n;return msg;",
+  "outputs": 1,
+  "timeout": "",
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 610,
+  "y": 3085,
+  "wires": [
+   [
+    "54fa000000000005",
+    "54fa000000000006"
+   ]
+  ]
+ },
+ {
+  "id": "54fa000000000008",
+  "type": "json",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "property": "payload.SearchOption",
+  "action": "",
+  "pretty": false,
+  "x": 450,
+  "y": 3085,
+  "wires": [
+   [
+    "54fa000000000007"
+   ]
+  ]
+ },
+ {
+  "id": "54fa000000000009",
+  "type": "debug",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "active": false,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": false,
+  "complete": "true",
+  "statusVal": "",
+  "statusType": "auto",
+  "x": 470,
+  "y": 3045,
+  "wires": [],
+  "targetType": "full"
+ },
+ {
+  "id": "54fa00000000000a",
+  "type": "http in",
+  "name": "",
+  "url": "/Instrument_searchFAForInput",
+  "method": "post",
+  "upload": true,
+  "swaggerDoc": "",
+  "x": 230,
+  "y": 3085,
+  "wires": [
+   [
+    "54fa000000000009",
+    "54fa000000000008"
+   ]
+  ],
+  "z": "4a603a04.1f0f84"
+ },
+ {
+  "id": "54fa00000000000b",
+  "type": "http response",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "statusCode": "",
+  "headers": {},
+  "x": 1150,
+  "y": 3190,
+  "wires": []
+ },
+ {
+  "id": "54fa00000000000c",
+  "type": "function",
+  "z": "4a603a04.1f0f84",
+  "name": "Check error",
+  "func": "\nif(msg.error !== undefined)\n{\n    msg.payload = \"error\";\n}\n\nreturn msg;\n\n\n",
+  "outputs": 1,
+  "timeout": "",
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 1010,
+  "y": 3190,
+  "wires": [
+   [
+    "54fa00000000000b"
+   ]
+  ]
+ },
+ {
+  "id": "54fa00000000000d",
+  "type": "debug",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "active": false,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": false,
+  "complete": "true",
+  "statusVal": "",
+  "statusType": "auto",
+  "x": 1150,
+  "y": 3150,
+  "wires": [],
+  "targetType": "full"
+ },
+ {
+  "id": "54fa00000000000e",
+  "type": "MSSQL",
+  "z": "4a603a04.1f0f84",
+  "mssqlCN": "427eb354.094c8c",
+  "name": "",
+  "outField": "payload",
+  "returnType": "0",
+  "throwErrors": "0",
+  "query": "",
+  "modeOpt": "",
+  "modeOptType": "query",
+  "queryOpt": "payload",
+  "queryOptType": "msg",
+  "paramsOpt": "",
+  "paramsOptType": "none",
+  "rows": "rows",
+  "rowsType": "msg",
+  "params": [],
+  "x": 820,
+  "y": 3185,
+  "wires": [
+   [
+    "54fa00000000000d",
+    "54fa00000000000c"
+   ]
+  ]
+ },
+ {
+  "id": "54fa00000000000f",
+  "type": "debug",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "active": false,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": false,
+  "complete": "false",
+  "statusVal": "",
+  "statusType": "auto",
+  "x": 810,
+  "y": 3145,
+  "wires": []
+ },
+ {
+  "id": "54fa000000000010",
+  "type": "function",
+  "z": "4a603a04.1f0f84",
+  "name": "Query Text",
+  "func": "var data = msg.payload.data;\nvar query = \"\";\nvar dt = global.get('DateTime');\n\n// ผลของหน้านี้เก็บเป็นทศนิยม 1 ตำแหน่งเสมอ\n// ค่าที่ไม่ใช่ตัวเลข (ช่องว่าง หรือ error เช่น DELIVERY ERROR) คงไว้ตามเดิม\nfunction toFixed1(v)\n{\n    if(v === null || v === undefined || v === '' || isNaN(v))\n    {\n        return (v === null || v === undefined) ? '' : v;\n    }\n    return parseFloat(v).toFixed(1);\n}\n\ndata[0].Result_1 = toFixed1(data[0].Result_1);\ndata[0].Result_2 = toFixed1(data[0].Result_2);\n\nvar statusForDel = '';\nif(data[0].ItemStatus == \"LIST NORMAL\" || data[0].ItemStatus == \"FINISH NORMAL\")\n{\n    statusForDel = `itemstatus in ('LIST NORMAL','FINISH NORMAL')`;\n}\nelse if(data[0].ItemStatus == \"LIST RECHECK\" || data[0].ItemStatus == \"FINISH RECHECK\")\n{\n    statusForDel = `itemstatus in ('LIST RECHECK','FINISH RECHECK')`;\n}\nelse\n{\n    statusForDel = `itemstatus in ('LIST RECONFIRM','FINISH RECONFIRM')`;\n}\n\nvar query2 = `\ndelete from Instrument_FA where RequestSample_ID = '${data[0].RequestSample_ID}' and ${statusForDel};\nInsert into Instrument_FA (RequestSample_ID,\nReqNo,\nJobType,\nIncharge,\nBranch,\nRequestSection,\nReqDate,\nCustFull,\nSampleCode,\nSampleGroup,\nSampleType,\nSampleTank,\nSampleName,\nSamplingDate,\nAnalysisDueDate,\nSampleRemark,\nSampleAttachFile,\nPosition,\nMag,\nTemp,\nStdFactor,\nStdMax,\nStdMin,\nItemNo,\nItemName,\nRemarkNo,\nItemStatus,\nUserAnalysis,\nUserAnalysisBranch,\nAnalysisDate,\n[ResultSymbol_1]\n,[Result_1]\n,[ResultUnit_1]\n,[ResultRemark_1]\n,[ResultFile_1]\n,[ResultSymbol_2]\n,[Result_2]\n,[ResultUnit_2]\n,[ResultRemark_2]\n,[ResultFile_2]\n) values\n('${data[0].RequestSample_ID}',\n'${data[0].ReqNo}',\n'${data[0].JobType}',\n'${data[0].Incharge}',\n'${data[0].Branch}',\n'${data[0].RequestSection}',\n'${(data[0].ReqDate).slice(0, 19).replace('T', ' ')}',\n'${data[0].CustFull}',\n'${data[0].SampleCode}',\n'${data[0].SampleGroup}',\n'${data[0].SampleType}',\n'${data[0].SampleTank}',\n'${data[0].SampleName}',\n'${(data[0].SamplingDate).split(\"/\").reverse().join(\"-\")}',\n'${(data[0].AnalysisDueDate).split(\"/\").reverse().join(\"-\")}',\n'${data[0].SampleRemark}',\n'${data[0].SampleAttachFile}',\n'${data[0].Position}',\n'${data[0].Mag}',\n'${data[0].Temp}',\n'${data[0].StdFactor}',\n'${data[0].StdMax}',\n'${data[0].StdMin}',\n'${data[0].ItemNo}',\n'${data[0].ItemName}',\n'${data[0].RemarkNo}',\n'${data[0].ItemStatus}',\n'${data[0].UserAnalysis}',\n'${data[0].UserAnalysisBranch}',\n'${dt}',\n'${data[0].ResultSymbol_1}',\n'${data[0].Result_1}',\n'${data[0].ResultUnit_1}',\n'${data[0].ResultRemark_1}',\n'${data[0].ResultFile_1}',\n'${data[0].ResultSymbol_2}',\n'${data[0].Result_2}',\n'${data[0].ResultUnit_2}',\n'${data[0].ResultRemark_2}',\n'${data[0].ResultFile_2}');\n`;\n\nmsg.payload = query2;\n\nreturn msg;",
+  "outputs": 1,
+  "timeout": "",
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 630,
+  "y": 3185,
+  "wires": [
+   [
+    "54fa00000000000f",
+    "54fa00000000000e"
+   ]
+  ]
+ },
+ {
+  "id": "54fa000000000011",
+  "type": "debug",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "active": false,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": false,
+  "complete": "false",
+  "statusVal": "",
+  "statusType": "auto",
+  "x": 630,
+  "y": 3145,
+  "wires": []
+ },
+ {
+  "id": "54fa000000000012",
+  "type": "json",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "property": "payload.data",
+  "action": "",
+  "pretty": false,
+  "x": 450,
+  "y": 3185,
+  "wires": [
+   [
+    "54fa000000000010",
+    "54fa000000000011"
+   ]
+  ]
+ },
+ {
+  "id": "54fa000000000013",
+  "type": "http in",
+  "name": "",
+  "url": "/Instrument_tempSaveDataFA",
+  "method": "post",
+  "upload": false,
+  "swaggerDoc": "",
+  "x": 230,
+  "y": 3185,
+  "wires": [
+   [
+    "54fa000000000012"
+   ]
+  ],
+  "z": "4a603a04.1f0f84"
+ },
+ {
+  "id": "54fa000000000014",
+  "type": "http response",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "statusCode": "",
+  "headers": {},
+  "x": 1150,
+  "y": 3290,
+  "wires": []
+ },
+ {
+  "id": "54fa000000000015",
+  "type": "function",
+  "z": "4a603a04.1f0f84",
+  "name": "Check error",
+  "func": "\nif(msg.error !== undefined)\n{\n    msg.payload = \"error\";\n}\n\nreturn msg;\n\n\n",
+  "outputs": 1,
+  "timeout": "",
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 1010,
+  "y": 3290,
+  "wires": [
+   [
+    "54fa000000000014"
+   ]
+  ]
+ },
+ {
+  "id": "54fa000000000016",
+  "type": "debug",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "active": false,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": false,
+  "complete": "true",
+  "statusVal": "",
+  "statusType": "auto",
+  "x": 1150,
+  "y": 3250,
+  "wires": [],
+  "targetType": "full"
+ },
+ {
+  "id": "54fa000000000017",
+  "type": "MSSQL",
+  "z": "4a603a04.1f0f84",
+  "mssqlCN": "427eb354.094c8c",
+  "name": "",
+  "outField": "payload",
+  "returnType": "0",
+  "throwErrors": "0",
+  "query": "",
+  "modeOpt": "",
+  "modeOptType": "query",
+  "queryOpt": "payload",
+  "queryOptType": "msg",
+  "paramsOpt": "",
+  "paramsOptType": "none",
+  "rows": "rows",
+  "rowsType": "msg",
+  "params": [],
+  "x": 820,
+  "y": 3285,
+  "wires": [
+   [
+    "54fa000000000016",
+    "54fa000000000015"
+   ]
+  ]
+ },
+ {
+  "id": "54fa000000000018",
+  "type": "debug",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "active": false,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": false,
+  "complete": "false",
+  "statusVal": "",
+  "statusType": "auto",
+  "x": 810,
+  "y": 3245,
+  "wires": []
+ },
+ {
+  "id": "54fa000000000019",
+  "type": "function",
+  "z": "4a603a04.1f0f84",
+  "name": "Query Text",
+  "func": "var data = msg.payload.data;\nvar query = \"\";\nvar dt = global.get('DateTime');\n\n// ผลของหน้านี้เก็บเป็นทศนิยม 1 ตำแหน่งเสมอ\n// ค่าที่ไม่ใช่ตัวเลข (ช่องว่าง หรือ error เช่น DELIVERY ERROR) คงไว้ตามเดิม\nfunction toFixed1(v)\n{\n    if(v === null || v === undefined || v === '' || isNaN(v))\n    {\n        return (v === null || v === undefined) ? '' : v;\n    }\n    return parseFloat(v).toFixed(1);\n}\n\ndata[0].Result_1 = toFixed1(data[0].Result_1);\ndata[0].Result_2 = toFixed1(data[0].Result_2);\n\nvar ResultApprove = '';\nif(isNaN(data[0].Result_2)||data[0].Result_2 == '')\n{\n    ResultApprove = data[0].Result_1;\n}\nelse\n{\n    ResultApprove = (parseFloat(data[0].Result_1)+parseFloat(data[0].Result_2))/2;\n}\n\n// ค่าเฉลี่ยอาจได้ 2 ตำแหน่ง (เช่น (12.3+12.4)/2 = 12.35) จึงต้องปัดอีกรอบ\nResultApprove = toFixed1(ResultApprove);\n\nif(data[0].ItemStatus == \"LIST NORMAL\" || data[0].ItemStatus == \"FINISH NORMAL\")\n{\n    query = `UPDATE Routine_RequestLab\n    SET itemStatus = 'FINISH NORMAL',\n    ResultSymbol1 = '${data[0].ResultSymbol_1}',\n    Result1 = '${data[0].Result_1}',\n    ResultUnit1 = '${data[0].ResultUnit_1}',\n    ResultRemark1 = '${data[0].ResultRemark_1}',\n    UserAnalysis1 = '${data[0].UserAnalysis}',\n    AnalysisDate1 = '${dt}',\n    ResultSymbol2 = '${data[0].ResultSymbol_2}',\n    Result2 = '${data[0].Result_2}',\n    ResultUnit2 = '${data[0].ResultUnit_2}',\n    ResultRemark2 = '${data[0].ResultRemark_2}',\n    UserAnalysis2 = '${data[0].UserAnalysis}',\n    AnalysisDate2 = '${dt}' ,\n    ResultApprove = '${ResultApprove}',\n    ResultApproveUnit = '${data[0].ResultUnit_1}'`;\n\n    if(data[0].Result_1 == \"DELIVERY ERROR\" || data[0].Result_1 == \"INSTRUMENT BREAKDOWN\")\n    {\n        query = query + `,ErrorName = '${data[0].Result_1}',\n        ErrorStatus = 'NORMAL',\n        ErrorInputDate = '${dt}' `;\n    }\n\n    query = query +` WHERE ID = '${data[0].RequestSample_ID}';`;\n\n}\nelse if (data[0].ItemStatus == \"LIST RECHECK\"||data[0].ItemStatus == \"FINISH RECHECK\")\n{\n    query = `UPDATE Routine_RequestLab\n    SET itemStatus = 'FINISH RECHECK',\n    ResultSymbol3 = '${data[0].ResultSymbol_1}',\n    Result3 = '${data[0].Result_1}',\n    ResultUnit3 = '${data[0].ResultUnit_1}',\n    ResultRemark3 = '${data[0].ResultRemark_1}',\n    UserAnalysis3 = '${data[0].UserAnalysis}',\n    AnalysisDate3 = '${dt}',\n    ResultSymbol4 = '${data[0].ResultSymbol_2}',\n    Result4 = '${data[0].Result_2}',\n    ResultUnit4 = '${data[0].ResultUnit_2}',\n    ResultRemark4 = '${data[0].ResultRemark_2}',\n    UserAnalysis4 = '${data[0].UserAnalysis}',\n    AnalysisDate4 = '${dt}',\n    ResultApprove = '${ResultApprove}',\n    ResultApproveUnit = '${data[0].ResultUnit_1}'`;\n\n    if(data[0].Result_1 == \"DELIVERY ERROR\" || data[0].Result_1 == \"INSTRUMENT BREAKDOWN\")\n    {\n        query = query + `,ErrorName = '${data[0].Result_1}',\n        ErrorStatus = 'RECHECK',\n        ErrorInputDate = '${dt}' `;\n    }\n\n    query = query +` WHERE ID = '${data[0].RequestSample_ID}';`;\n\n}\nelse\n{\n    query = `UPDATE Routine_RequestLab\n    SET itemStatus = 'FINISH RECONFIRM',\n    ResultSymbol5 = '${data[0].ResultSymbol_1}',\n    Result5 = '${data[0].Result_1}',\n    ResultUnit5 = '${data[0].ResultUnit_1}',\n    ResultRemark5 = '${data[0].ResultRemark_1}',\n    UserAnalysis5 = '${data[0].UserAnalysis}',\n    AnalysisDate5 = '${dt}',\n    ResultSymbol6 = '${data[0].ResultSymbol_2}',\n    Result6 = '${data[0].Result_2}',\n    ResultUnit6 = '${data[0].ResultUnit_2}',\n    ResultRemark6 = '${data[0].ResultRemark_2}',\n    UserAnalysis6 = '${data[0].UserAnalysis}',\n    AnalysisDate6 = '${dt}',\n    ResultApprove = '${ResultApprove}',\n    ResultApproveUnit = '${data[0].ResultUnit_1}'`;\n\n    if(data[0].Result_1 == \"DELIVERY ERROR\" || data[0].Result_1 == \"INSTRUMENT BREAKDOWN\")\n    {\n        query = query + `,ErrorName = '${data[0].Result_1}',\n        ErrorStatus = 'RECONFIRM',\n        ErrorInputDate = '${dt}' `;\n    }\n\n    query = query +` WHERE ID = '${data[0].RequestSample_ID}';`;\n\n}\n\nvar status = \"\";\nif(data[0].ItemStatus == \"LIST NORMAL\" || data[0].ItemStatus == \"FINISH NORMAL\")\n{\n    status = \"FINISH NORMAL\";\n}\nelse if(data[0].ItemStatus == \"LIST RECHECK\" || data[0].ItemStatus == \"FINISH RECHECK\")\n{\n    status = \"FINISH RECHECK\";\n}\nelse if(data[0].ItemStatus == \"LIST RECONFIRM\" || data[0].ItemStatus == \"FINISH RECONFIRM\")\n{\n    status = \"FINISH RECONFIRM\";\n}\n\nvar statusForDel = '';\nif(data[0].ItemStatus == \"LIST NORMAL\" || data[0].ItemStatus == \"FINISH NORMAL\")\n{\n    statusForDel = `itemstatus in ('LIST NORMAL','FINISH NORMAL')`;\n}\nelse if(data[0].ItemStatus == \"LIST RECHECK\" || data[0].ItemStatus == \"FINISH RECHECK\")\n{\n    statusForDel = `itemstatus in ('LIST RECHECK','FINISH RECHECK')`;\n}\nelse\n{\n    statusForDel = `itemstatus in ('LIST RECONFIRM','FINISH RECONFIRM')`;\n}\n\nvar query2 = `\ndelete from Instrument_FA where RequestSample_ID = '${data[0].RequestSample_ID}' and ${statusForDel};\nInsert into Instrument_FA (RequestSample_ID,\nReqNo,\nJobType,\nIncharge,\nBranch,\nRequestSection,\nReqDate,\nCustFull,\nSampleCode,\nSampleGroup,\nSampleType,\nSampleTank,\nSampleName,\nSamplingDate,\nAnalysisDueDate,\nSampleRemark,\nSampleAttachFile,\nPosition,\nMag,\nTemp,\nStdFactor,\nStdMax,\nStdMin,\nItemNo,\nItemName,\nRemarkNo,\nItemStatus,\nUserAnalysis,\nUserAnalysisBranch,\nAnalysisDate,\n[ResultSymbol_1]\n,[Result_1]\n,[ResultUnit_1]\n,[ResultRemark_1]\n,[ResultFile_1]\n,[ResultSymbol_2]\n,[Result_2]\n,[ResultUnit_2]\n,[ResultRemark_2]\n,[ResultFile_2]\n) values\n('${data[0].RequestSample_ID}',\n'${data[0].ReqNo}',\n'${data[0].JobType}',\n'${data[0].Incharge}',\n'${data[0].Branch}',\n'${data[0].RequestSection}',\n'${(data[0].ReqDate).slice(0, 19).replace('T', ' ')}',\n'${data[0].CustFull}',\n'${data[0].SampleCode}',\n'${data[0].SampleGroup}',\n'${data[0].SampleType}',\n'${data[0].SampleTank}',\n'${data[0].SampleName}',\n'${(data[0].SamplingDate).split(\"/\").reverse().join(\"-\")}',\n'${(data[0].AnalysisDueDate).split(\"/\").reverse().join(\"-\")}',\n'${data[0].SampleRemark}',\n'${data[0].SampleAttachFile}',\n'${data[0].Position}',\n'${data[0].Mag}',\n'${data[0].Temp}',\n'${data[0].StdFactor}',\n'${data[0].StdMax}',\n'${data[0].StdMin}',\n'${data[0].ItemNo}',\n'${data[0].ItemName}',\n'${data[0].RemarkNo}',\n'${status}',\n'${data[0].UserAnalysis}',\n'${data[0].UserAnalysisBranch}',\n'${dt}',\n'${data[0].ResultSymbol_1}',\n'${data[0].Result_1}',\n'${data[0].ResultUnit_1}',\n'${data[0].ResultRemark_1}',\n'${data[0].ResultFile_1}',\n'${data[0].ResultSymbol_2}',\n'${data[0].Result_2}',\n'${data[0].ResultUnit_2}',\n'${data[0].ResultRemark_2}',\n'${data[0].ResultFile_2}');\n`;\n\nmsg.payload = query+query2;\n\nreturn msg;",
+  "outputs": 1,
+  "timeout": "",
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 630,
+  "y": 3285,
+  "wires": [
+   [
+    "54fa000000000018",
+    "54fa000000000017"
+   ]
+  ]
+ },
+ {
+  "id": "54fa00000000001a",
+  "type": "debug",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "active": false,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": false,
+  "complete": "false",
+  "statusVal": "",
+  "statusType": "auto",
+  "x": 630,
+  "y": 3245,
+  "wires": []
+ },
+ {
+  "id": "54fa00000000001b",
+  "type": "json",
+  "z": "4a603a04.1f0f84",
+  "name": "",
+  "property": "payload.data",
+  "action": "",
+  "pretty": false,
+  "x": 450,
+  "y": 3285,
+  "wires": [
+   [
+    "54fa000000000019",
+    "54fa00000000001a"
+   ]
+  ]
+ },
+ {
+  "id": "54fa00000000001c",
+  "type": "http in",
+  "name": "",
+  "url": "/Instrument_saveDataFA",
+  "method": "post",
+  "upload": false,
+  "swaggerDoc": "",
+  "x": 220,
+  "y": 3285,
+  "wires": [
+   [
+    "54fa00000000001b"
+   ]
+  ],
+  "z": "4a603a04.1f0f84"
+ }
+]

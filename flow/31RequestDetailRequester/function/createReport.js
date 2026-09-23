@@ -6,6 +6,15 @@ exports.CreateReport = async (reqNo) => {
   console.log("in CreateReport");
   console.log("CreateReportreqNo: " + reqNo); // Debugging
 
+  // งาน OVS : report สร้างจาก Routine_RequestLab ผ่าน route ของ OVS
+  // ถ้าปล่อยมาทางนี้ Pattern_0Select ของ SAR เดิมไม่รู้จัก pattern ของ OVS
+  // แล้วจะตกไปที่ else ปิดท้ายซึ่ง fallback เป็น K1 เสมอ
+  // require แบบ lazy เพราะ KAC_ReportOVS.js require ไฟล์นี้กลับมา (circular)
+  if (String(reqNo || "").trim().toUpperCase().startsWith("OVS")) {
+    const ovs = require("../KAC_Report/KAC_ReportOVS.js");
+    return await ovs.createReportOvs(reqNo, ovs.RESULT_FIELD_CREATE);
+  }
+
   // ส่ง reqNo ไปยังไฟล์ Pattern_5MasterDoc.js
   masterDoc.setReqNo(reqNo);
   masterDocYearly.setReqNo(reqNo);
