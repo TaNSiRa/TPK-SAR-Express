@@ -1,5 +1,10 @@
 const Pattern_AKZ = require("./Pattern_AKZ.js");
 const Pattern_NPI = require("./Pattern_NPI.js");
+const Pattern_NPM = require("./Pattern_NPM.js");
+const Pattern_PPI_Toyota = require("./Pattern_PPI_Toyota.js");
+const Pattern_PPI_Mitsu = require("./Pattern_PPI_Mitsu.js");
+const Pattern_PPI_Metal = require("./Pattern_PPI_Metal.js");
+const Pattern_VPC_MitsubishiVN = require("./Pattern_VPC_MitsubishiVN.js");
 
 // -------------------------------------------------------------------------
 // ตัวเลือก pattern ของระบบ OVS
@@ -13,6 +18,12 @@ const Pattern_NPI = require("./Pattern_NPI.js");
 const PATTERNS = {
   AKZ: Pattern_AKZ,
   NPI: Pattern_NPI,
+  NPM: Pattern_NPM,
+  // key ต้องเป็นตัวพิมพ์ใหญ่ เพราะเทียบกับ PatternReport ที่ toUpperCase แล้ว
+  "PPI - TOYOTA": Pattern_PPI_Toyota,
+  "PPI - MITSU": Pattern_PPI_Mitsu,
+  "PPI - METAL": Pattern_PPI_Metal,
+  "VPC-MITSUBISHI VN": Pattern_VPC_MitsubishiVN,
 };
 
 exports.HasPattern = (patternReport) => {

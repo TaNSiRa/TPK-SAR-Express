@@ -1,8 +1,10 @@
 const fs = require("fs");
+const { jsPDF } = require("jspdf");
+require("jspdf-autotable");
 const util = require("./Ovs_Util.js");
 
 // -------------------------------------------------------------------------
-// ช่องเซ็นท้ายรายงาน OVS : ตาราง 4 กรอบตายตัว ชิดขวาของหน้าสุดท้าย
+// ช่องเซ็นท้ายรายงาน OVS : ตาราง 4 กรอบตายตัว อยู่มุมล่างขวาของหน้าสุดท้ายเสมอ
 //
 // เรียงซ้ายไปขวา : UserApprove -> คนกด create report -> DGM -> JP
 // หัวกรอบ : Approved data by -> Checked by -> Review by -> Approved by
@@ -22,6 +24,7 @@ const BOX_WIDTH = 30; // mm ต่อ 1 กรอบ
 const SIGN_HEIGHT = 16; // ความสูงแถวที่เว้นไว้ให้รูปลายเซ็น
 const NAME_HEIGHT = 9; // ความสูงช่องชื่อ + ตำแหน่ง (2 บรรทัด)
 const MARGIN_RIGHT = 18; // ให้ชิดขวาเท่ากับ margin ของตารางหลัก
+const BOTTOM_MARGIN = 20; // ขอบล่างของช่องเซ็นห่างขอบกระดาษ (เลข form อยู่ที่ 10 mm)
 
 // หัวของแต่ละกรอบ เรียงตามลำดับผู้เซ็นด้านบน
 const HEAD_LABELS = ["Approved data by:", "Checked by:", "Review by:", "Approved by:"];
@@ -46,12 +49,19 @@ function cellStyle(extra) {
   );
 }
 
+// วาดตารางลงเอกสารทดลองเพื่อวัดความสูงจริง (ชื่อยาวอาจตัดบรรทัดทำให้สูงขึ้น)
+function measureHeight(tableOptions) {
+  const scratch = new jsPDF();
+  scratch.autoTable({ ...tableOptions, startY: 0, margin: { ...tableOptions.margin, top: 0 } });
+  return scratch.lastAutoTable.finalY;
+}
+
 function positionText(position) {
   const text = util.safe(position);
   return text === "" ? "" : "(" + text + ")";
 }
 
-exports.DrawSignature = (doc, signers, currentY) => {
+function buildTable(doc, signers) {
   const list = [];
   for (let i = 0; i < BOX_COUNT; i++) {
     const signer = (signers && signers[i]) || {};
@@ -63,15 +73,8 @@ exports.DrawSignature = (doc, signers, currentY) => {
   }
 
   const pageWidth = doc.internal.pageSize.width;
-  const pageHeight = doc.internal.pageSize.height;
   const tableWidth = BOX_WIDTH * BOX_COUNT;
   const left = pageWidth - MARGIN_RIGHT - tableWidth;
-
-  // เผื่อที่ให้หัวตาราง + แถวรูป + ชื่อ + ตำแหน่ง ไม่ให้ตกขอบล่าง
-  if (currentY > pageHeight - (SIGN_HEIGHT + 30)) {
-    doc.addPage();
-    currentY = 20;
-  }
 
   // ชื่อกับตำแหน่งอยู่ช่องเดียวกันคนละบรรทัด จะได้ไม่มีเส้นคั่นระหว่างกัน
   // สูงเผื่อไว้ 2 บรรทัดเสมอ กรอบจะได้สูงเท่ากันแม้ยังไม่มีชื่อ
@@ -88,14 +91,37 @@ exports.DrawSignature = (doc, signers, currentY) => {
     });
   });
 
-  doc.autoTable({
-    startY: currentY,
+  const tableOptions = {
     head: [head],
     body: [signRow, nameRow],
     theme: "grid",
     margin: { left: left, right: MARGIN_RIGHT },
     tableWidth: tableWidth,
     styles: { lineColor: LINE_COLOR, lineWidth: 0.1 },
+  };
+
+  return { list, tableOptions };
+}
+
+// ช่องเซ็นต้องอยู่ล่างขวาของกระดาษเสมอ : วางให้ขอบล่างของตารางอยู่ที่ขอบล่างที่กำหนด
+// คืนขอบบนของช่องเซ็น ให้ pattern เช็คก่อนได้ว่าเนื้อหาท้ายรายงานจะทับช่องเซ็นหรือไม่
+function topYOf(doc, tableOptions) {
+  const bottomY = doc.internal.pageSize.height - BOTTOM_MARGIN;
+  return bottomY - measureHeight(tableOptions);
+}
+
+exports.TopY = (doc, signers) => topYOf(doc, buildTable(doc, signers).tableOptions);
+
+exports.DrawSignature = (doc, signers, currentY) => {
+  const { list, tableOptions } = buildTable(doc, signers);
+
+  // currentY คือจุดต่ำสุดที่เนื้อหาใช้ไปแล้ว ถ้าช่องเซ็นจะทับเนื้อหาให้ขึ้นหน้าใหม่
+  const topY = topYOf(doc, tableOptions);
+  if (currentY > topY) doc.addPage();
+
+  doc.autoTable({
+    ...tableOptions,
+    startY: topY,
     didDrawCell: function (data) {
       // แถว index 0 ของ body คือแถวที่เว้นไว้ให้รูปลายเซ็น
       if (data.section !== "body" || data.row.index !== 0) return;

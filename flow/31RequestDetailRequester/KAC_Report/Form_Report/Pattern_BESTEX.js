@@ -707,7 +707,7 @@ async function PicSetAPM(dataReport, CurrentRound, doc, currentY) {
         maxCellHeight: 12,
         //cellWidth: 17,
       },
-      margin: { bottom: 20 },
+      margin: { bottom: 10 },
       columnStyles: {
         0: {
           /* cellWidth: 75 */

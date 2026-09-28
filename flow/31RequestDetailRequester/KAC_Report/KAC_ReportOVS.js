@@ -195,6 +195,25 @@ async function loadSemOvs(reqNo) {
   return map;
 }
 
+// ค่าดิบของเครื่อง F-F (RawData_1 / RawData_2) ผูกกับ Routine_RequestLab ด้วย
+// RequestSample_ID = Routine_RequestLab.ID
+// แถวเดียวกันอาจถูกวัดซ้ำ (recheck) จึงเอาแถวล่าสุด (ID มากสุด) ของแต่ละ RequestSample_ID
+async function loadFfRawData(reqNo) {
+  const map = {};
+  const db = await mssql.qurey(
+    `select RequestSample_ID, RawData_1, RawData_2
+     from [SAR].[dbo].[Instrument_FF] where ReqNo = '${sqlEscape(reqNo)}'
+     order by ID desc;`
+  );
+  if (!db || !db.recordset) return map;
+  db.recordset.forEach((row) => {
+    const key = safe(row.RequestSample_ID);
+    if (key === "" || map[key]) return;
+    map[key] = [safe(row.RawData_1), safe(row.RawData_2)];
+  });
+  return map;
+}
+
 // master เก็บ '-' เมื่อไม่มีคนในสายนั้น ในช่องเซ็นให้แสดงเป็นว่าง
 function signerName(value) {
   const text = safe(value);
@@ -315,7 +334,8 @@ function mergeSameReportOrder(rows) {
 async function loadRequestRows(reqNo, includeUnordered) {
   const orderFilter = includeUnordered ? "" : " and ReportOrder != 0";
   const db = await mssql.qurey(
-    `select [CustFull]
+    `select [ID]
+           ,[CustFull]
            ,[CustShort]
            ,[ReqNo]
            ,[ReportOrder]
@@ -390,6 +410,7 @@ async function buildOvsReport(reqNoIn, resultFieldIn) {
   }
 
   const semOvs = await loadSemOvs(reqNo);
+  const ffRawData = await loadFfRawData(reqNo);
 
   // วันที่ในหัวรายงาน
   let receiveDate = null;
@@ -458,6 +479,8 @@ async function buildOvsReport(reqNoIn, resultFieldIn) {
         sampleName: safe(row.SampleName),
         // pattern NPI ใช้ SampleRemark เป็นช่อง Sampling Date ของแต่ละตัวอย่าง
         sampleRemark: safe(row.SampleRemark),
+        // pattern PPI - Toyota ใช้ SamplingDate ของแต่ละตัวอย่าง (ไม่ใช่ของทั้ง request)
+        samplingDate: row.SamplingDate || null,
         processReportName: safe(row.ProcessReportName),
         coatingAppearance: sem.coatingAppearance || "",
         crystalSize: sem.crystalSize || "",
@@ -496,6 +519,8 @@ async function buildOvsReport(reqNoIn, resultFieldIn) {
       Result: result,
       // pattern NPI แสดง remark ตอน approve ไว้ใต้ผลในวงเล็บ
       ApproveRemark: safe(row.ResultApproveRemark),
+      // pattern PPI - Toyota ใช้ค่าดิบของ F-F แสดงในวงเล็บใต้ผลที่เป็น "< ..."
+      FfRawData: ffRawData[safe(row.ID)] || [],
     };
     item.Evaluation = ovsUtil.evaluate(item);
     sample.items.push(item);
