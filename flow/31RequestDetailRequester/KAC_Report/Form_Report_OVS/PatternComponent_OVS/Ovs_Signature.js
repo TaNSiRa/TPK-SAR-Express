@@ -32,7 +32,7 @@ const HEAD_LABELS = ["Approved data by:", "Checked by:", "Review by:", "Approved
 const HEAD_FILL = [189, 215, 238]; // ฟ้าอ่อนตามแบบฟอร์มตัวอย่าง
 const LINE_COLOR = [0, 0, 0];
 
-function cellStyle(extra) {
+function cellStyle(extra, boxWidth) {
   return Object.assign(
     {
       textColor: 0,
@@ -40,7 +40,7 @@ function cellStyle(extra) {
       fontSize: 9,
       valign: "middle",
       halign: "center",
-      cellWidth: BOX_WIDTH,
+      cellWidth: boxWidth,
       cellPadding: 0.8,
       lineColor: LINE_COLOR,
       lineWidth: 0.1,
@@ -51,8 +51,10 @@ function cellStyle(extra) {
 
 // วาดตารางลงเอกสารทดลองเพื่อวัดความสูงจริง (ชื่อยาวอาจตัดบรรทัดทำให้สูงขึ้น)
 function measureHeight(tableOptions) {
+  // ความกว้างตารางตายตัวอยู่แล้ว ไม่ต้องใช้ margin ซ้ายของหน้าจริง
+  // (กระดาษ A3 margin ซ้ายเกินความกว้าง A4 ของเอกสารทดลอง)
   const scratch = new jsPDF();
-  scratch.autoTable({ ...tableOptions, startY: 0, margin: { ...tableOptions.margin, top: 0 } });
+  scratch.autoTable({ ...tableOptions, startY: 0, margin: { left: 0, right: 0, top: 0 } });
   return scratch.lastAutoTable.finalY;
 }
 
@@ -61,7 +63,15 @@ function positionText(position) {
   return text === "" ? "" : "(" + text + ")";
 }
 
-function buildTable(doc, signers) {
+// ความกว้างต่อกรอบ : pattern ที่ต้องวางช่องเซ็นข้างตาราง (เช่น A3 แนวนอน) ส่ง options.boxWidth มาได้
+function boxWidthOf(options) {
+  return (options && options.boxWidth) || BOX_WIDTH;
+}
+
+// labels : หัวกรอบของ pattern ที่ใช้คำต่างจากค่าเริ่มต้น (ต้องมี BOX_COUNT ช่อง)
+function buildTable(doc, signers, labels, options) {
+  const headLabels = labels || HEAD_LABELS;
+  const boxWidth = boxWidthOf(options);
   const list = [];
   for (let i = 0; i < BOX_COUNT; i++) {
     const signer = (signers && signers[i]) || {};
@@ -73,7 +83,7 @@ function buildTable(doc, signers) {
   }
 
   const pageWidth = doc.internal.pageSize.width;
-  const tableWidth = BOX_WIDTH * BOX_COUNT;
+  const tableWidth = boxWidth * BOX_COUNT;
   const left = pageWidth - MARGIN_RIGHT - tableWidth;
 
   // ชื่อกับตำแหน่งอยู่ช่องเดียวกันคนละบรรทัด จะได้ไม่มีเส้นคั่นระหว่างกัน
@@ -82,12 +92,12 @@ function buildTable(doc, signers) {
   const signRow = [];
   const nameRow = [];
   list.forEach((signer, index) => {
-    head.push({ content: HEAD_LABELS[index], styles: cellStyle({ fillColor: HEAD_FILL }) });
-    signRow.push({ content: "", styles: cellStyle({ minCellHeight: SIGN_HEIGHT }) });
+    head.push({ content: headLabels[index], styles: cellStyle({ fillColor: HEAD_FILL }, boxWidth) });
+    signRow.push({ content: "", styles: cellStyle({ minCellHeight: SIGN_HEIGHT }, boxWidth) });
     const lines = [util.toSignName(signer.name), positionText(signer.position)];
     nameRow.push({
       content: lines.filter((line) => line !== "").join("\n"),
-      styles: cellStyle({ minCellHeight: NAME_HEIGHT }),
+      styles: cellStyle({ minCellHeight: NAME_HEIGHT }, boxWidth),
     });
   });
 
@@ -100,7 +110,7 @@ function buildTable(doc, signers) {
     styles: { lineColor: LINE_COLOR, lineWidth: 0.1 },
   };
 
-  return { list, tableOptions };
+  return { list, tableOptions, boxWidth };
 }
 
 // ช่องเซ็นต้องอยู่ล่างขวาของกระดาษเสมอ : วางให้ขอบล่างของตารางอยู่ที่ขอบล่างที่กำหนด
@@ -110,10 +120,14 @@ function topYOf(doc, tableOptions) {
   return bottomY - measureHeight(tableOptions);
 }
 
-exports.TopY = (doc, signers) => topYOf(doc, buildTable(doc, signers).tableOptions);
+exports.TopY = (doc, signers, labels, options) =>
+  topYOf(doc, buildTable(doc, signers, labels, options).tableOptions);
 
-exports.DrawSignature = (doc, signers, currentY) => {
-  const { list, tableOptions } = buildTable(doc, signers);
+// ความกว้างทั้งหมดของช่องเซ็น ให้ pattern เช็คได้ว่าวางข้างตารางได้หรือไม่
+exports.Width = (options) => boxWidthOf(options) * BOX_COUNT;
+
+exports.DrawSignature = (doc, signers, currentY, labels, options) => {
+  const { list, tableOptions, boxWidth } = buildTable(doc, signers, labels, options);
 
   // currentY คือจุดต่ำสุดที่เนื้อหาใช้ไปแล้ว ถ้าช่องเซ็นจะทับเนื้อหาให้ขึ้นหน้าใหม่
   const topY = topYOf(doc, tableOptions);
@@ -134,7 +148,7 @@ exports.DrawSignature = (doc, signers, currentY) => {
           "jpg",
           data.cell.x + 1,
           data.cell.y + 1,
-          BOX_WIDTH - 2,
+          boxWidth - 2,
           SIGN_HEIGHT - 2
         );
       } catch (err) {

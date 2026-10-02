@@ -354,6 +354,7 @@ async function loadRequestRows(reqNo, includeUnordered) {
            ,[ItemName]
            ,[ItemReportName]
            ,[InstrumentName]
+           ,[Position]
            ,[StdFactor]
            ,[StdMin]
            ,[StdSymbol]
@@ -372,6 +373,102 @@ async function loadRequestRows(reqNo, includeUnordered) {
               ReportOrder asc, ItemNo asc;`
   );
   return db;
+}
+
+// จัดกลุ่ม : tank -> sample -> item
+// ใช้ร่วมกันระหว่าง report ของ request จริง และ preview จาก master
+function groupTanks(rows, resultField, semOvs, ffRawData) {
+  const tankOrder = [];
+  const tankMap = {};
+  const sampleMap = {};
+
+  rows.forEach((row) => {
+    const tankName = safe(row.SampleTank);
+    if (!tankMap[tankName]) {
+      // Process & Product Name ของทุกหน้าใน line นี้ ใช้ SampleName ของ
+      // sample แรกของ line (ตัวน้ำยา) ไม่ใช่ของชิ้นทดสอบ
+      // แถวเรียงตาม SampleNo อยู่แล้ว แถวแรกที่เจอจึงเป็น SampleNo น้อยสุด
+      tankMap[tankName] = {
+        tankName: tankName,
+        productName: safe(row.SampleName),
+        solutions: [],
+        performances: [],
+      };
+      tankOrder.push(tankName);
+    }
+
+    const sampleKey = tankName + "|" + numValue(row.SampleNo, 0);
+    let sample = sampleMap[sampleKey];
+    if (!sample) {
+      const sampleCode = safe(row.SampleCode);
+      const sem = semOvs[sampleCode] || {};
+      sample = {
+        sampleNo: numValue(row.SampleNo, 0),
+        sampleCode: sampleCode,
+        sampleName: safe(row.SampleName),
+        // pattern NPI ใช้ SampleRemark เป็นช่อง Sampling Date ของแต่ละตัวอย่าง
+        sampleRemark: safe(row.SampleRemark),
+        // pattern PPI - Toyota ใช้ SamplingDate ของแต่ละตัวอย่าง (ไม่ใช่ของทั้ง request)
+        samplingDate: row.SamplingDate || null,
+        processReportName: safe(row.ProcessReportName),
+        // pattern VPH-FUJITON VN-GL ใช้ SampleType เป็นช่อง Chemical name
+        sampleType: safe(row.SampleType),
+        coatingAppearance: sem.coatingAppearance || "",
+        crystalSize: sem.crystalSize || "",
+        items: [],
+        picture: null,
+        // ทุกรูปของ sample นี้ (picture เก็บได้แค่รูปเดียว)
+        // pattern VPH-TMV-FRAME LINE มีรูป SEM 4 รูปต่อ sample แยกด้วย Position
+        pictures: [],
+        isPerformance: false,
+      };
+      sampleMap[sampleKey] = sample;
+      // ReportOrder >= 100 คือบล็อกของชิ้นทดสอบ ต่ำกว่านั้นเป็นน้ำยา
+      if (numValue(row.ReportOrder, 0) >= 100) {
+        sample.isPerformance = true;
+        tankMap[tankName].performances.push(sample);
+      } else {
+        tankMap[tankName].solutions.push(sample);
+      }
+    }
+
+    const result = resultOf(row, resultField);
+    if (isPictureRow(row, resultField)) {
+      sample.picture = {
+        itemReportName: safe(row.ItemReportName),
+        path: result.indexOf("pic_") !== -1 ? result : "",
+      };
+      sample.pictures.push({
+        ...sample.picture,
+        ReportOrder: numValue(row.ReportOrder, 0),
+        ItemName: safe(row.ItemName),
+        Position: safe(row.Position),
+      });
+      return;
+    }
+
+    const item = {
+      ReportOrder: numValue(row.ReportOrder, 0),
+      // pattern NPI หาคอลัมน์ P-ratio / Ni / Mn จาก ItemName ไม่ใช่ ItemReportName
+      ItemName: safe(row.ItemName),
+      ItemReportName: safe(row.ItemReportName),
+      ControlRange: safe(row.ControlRange),
+      StdMin: safe(row.StdMin),
+      StdMax: safe(row.StdMax),
+      StdSymbol: safe(row.StdSymbol),
+      Result: result,
+      // pattern NPI แสดง remark ตอน approve ไว้ใต้ผลในวงเล็บ
+      ApproveRemark: safe(row.ResultApproveRemark),
+      // pattern PPI - Toyota ใช้ค่าดิบของ F-F แสดงในวงเล็บใต้ผลที่เป็น "< ..."
+      FfRawData: ffRawData[safe(row.ID)] || [],
+      // pattern VPC-Dong A แยกผลด้าน Top / Bottom ของตัวอย่างเดียวกันด้วย Position
+      Position: safe(row.Position),
+    };
+    item.Evaluation = ovsUtil.evaluate(item);
+    sample.items.push(item);
+  });
+
+  return tankOrder.map((name) => tankMap[name]);
 }
 
 // -------------------------------------------------------------------------
@@ -448,85 +545,7 @@ async function buildOvsReport(reqNoIn, resultFieldIn) {
     signed: signer.signed && signer.name !== "",
   }));
 
-  // จัดกลุ่ม : tank -> sample -> item
-  const tankOrder = [];
-  const tankMap = {};
-  const sampleMap = {};
-
-  rows.forEach((row) => {
-    const tankName = safe(row.SampleTank);
-    if (!tankMap[tankName]) {
-      // Process & Product Name ของทุกหน้าใน line นี้ ใช้ SampleName ของ
-      // sample แรกของ line (ตัวน้ำยา) ไม่ใช่ของชิ้นทดสอบ
-      // แถวเรียงตาม SampleNo อยู่แล้ว แถวแรกที่เจอจึงเป็น SampleNo น้อยสุด
-      tankMap[tankName] = {
-        tankName: tankName,
-        productName: safe(row.SampleName),
-        solutions: [],
-        performances: [],
-      };
-      tankOrder.push(tankName);
-    }
-
-    const sampleKey = tankName + "|" + numValue(row.SampleNo, 0);
-    let sample = sampleMap[sampleKey];
-    if (!sample) {
-      const sampleCode = safe(row.SampleCode);
-      const sem = semOvs[sampleCode] || {};
-      sample = {
-        sampleNo: numValue(row.SampleNo, 0),
-        sampleCode: sampleCode,
-        sampleName: safe(row.SampleName),
-        // pattern NPI ใช้ SampleRemark เป็นช่อง Sampling Date ของแต่ละตัวอย่าง
-        sampleRemark: safe(row.SampleRemark),
-        // pattern PPI - Toyota ใช้ SamplingDate ของแต่ละตัวอย่าง (ไม่ใช่ของทั้ง request)
-        samplingDate: row.SamplingDate || null,
-        processReportName: safe(row.ProcessReportName),
-        coatingAppearance: sem.coatingAppearance || "",
-        crystalSize: sem.crystalSize || "",
-        items: [],
-        picture: null,
-        isPerformance: false,
-      };
-      sampleMap[sampleKey] = sample;
-      // ReportOrder >= 100 คือบล็อกของชิ้นทดสอบ ต่ำกว่านั้นเป็นน้ำยา
-      if (numValue(row.ReportOrder, 0) >= 100) {
-        sample.isPerformance = true;
-        tankMap[tankName].performances.push(sample);
-      } else {
-        tankMap[tankName].solutions.push(sample);
-      }
-    }
-
-    const result = resultOf(row, resultField);
-    if (isPictureRow(row, resultField)) {
-      sample.picture = {
-        itemReportName: safe(row.ItemReportName),
-        path: result.indexOf("pic_") !== -1 ? result : "",
-      };
-      return;
-    }
-
-    const item = {
-      ReportOrder: numValue(row.ReportOrder, 0),
-      // pattern NPI หาคอลัมน์ P-ratio / Ni / Mn จาก ItemName ไม่ใช่ ItemReportName
-      ItemName: safe(row.ItemName),
-      ItemReportName: safe(row.ItemReportName),
-      ControlRange: safe(row.ControlRange),
-      StdMin: safe(row.StdMin),
-      StdMax: safe(row.StdMax),
-      StdSymbol: safe(row.StdSymbol),
-      Result: result,
-      // pattern NPI แสดง remark ตอน approve ไว้ใต้ผลในวงเล็บ
-      ApproveRemark: safe(row.ResultApproveRemark),
-      // pattern PPI - Toyota ใช้ค่าดิบของ F-F แสดงในวงเล็บใต้ผลที่เป็น "< ..."
-      FfRawData: ffRawData[safe(row.ID)] || [],
-    };
-    item.Evaluation = ovsUtil.evaluate(item);
-    sample.items.push(item);
-  });
-
-  const tanks = tankOrder.map((name) => tankMap[name]);
+  const tanks = groupTanks(rows, resultField, semOvs, ffRawData);
 
   return {
     reqNo: reqNo,
@@ -541,6 +560,118 @@ async function buildOvsReport(reqNoIn, resultFieldIn) {
     tanks: tanks,
   };
 }
+
+// -------------------------------------------------------------------------
+// PREVIEW จาก MASTER : สร้าง report ของ OVS จาก Routine_MasterPatternLab
+// (ยังไม่มี request จริง) เพื่อดูหน้าตา report หลังแก้ master
+//   - 1 แถวของ master = 1 แถวของ Routine_RequestLab ตอนสร้าง request
+//   - ไม่มีค่าผล ไม่มีรูป ไม่มีคนเซ็น (โชว์ชื่อแต่ไม่ลงลายเซ็น)
+// หา master lab ด้วย CustFull เพราะ CustShort ของ TS กับ Lab ไม่ตรงกันบางราย
+// (เช่น 'VPH-FUJITON VN-GL' กับ 'VPH -FUJITON VN-GL')
+// -------------------------------------------------------------------------
+async function buildOvsReportFromMaster(custShortIn, custFullIn) {
+  const custShortReq = safe(custShortIn);
+  const custFullReq = safe(custFullIn);
+  if (custShortReq === "" && custFullReq === "") {
+    return { error: "ไม่ได้ระบุลูกค้า" };
+  }
+
+  const master = await loadHeaderFromMaster(custShortReq, custFullReq);
+
+  let custFull = custFullReq;
+  if (custFull === "") {
+    const dbTS = await mssql.qurey(
+      `select top 1 CustFull from [SAR].[dbo].[Routine_MasterPatternTS]
+       where CustShort = N'${sqlEscape(custShortReq)}';`
+    );
+    if (dbTS && dbTS.recordset && dbTS.recordset.length > 0) {
+      custFull = safe(dbTS.recordset[0].CustFull);
+    }
+  }
+  const whereLab =
+    custFull !== ""
+      ? `CustFull = N'${sqlEscape(custFull)}'`
+      : `CustShort = N'${sqlEscape(custShortReq)}'`;
+
+  const db = await mssql.qurey(
+    `select * from [SAR].[dbo].[Routine_MasterPatternLab] where ${whereLab}
+     order by SampleNo asc,
+              case when ReportOrder = 0 then 1 else 0 end asc,
+              ReportOrder asc, ItemNo asc;`
+  );
+  if (!db || !db.recordset) {
+    return { error: "อ่าน Routine_MasterPatternLab ไม่สำเร็จ : " + errText(db) };
+  }
+
+  const rows = createpdfOvs.UsesAllItems(master.PatternReport)
+    ? db.recordset
+    : db.recordset.filter((row) => numValue(row.ReportOrder, 0) !== 0);
+  if (rows.length === 0) {
+    return { error: "ไม่พบรายการของ " + (custFull || custShortReq) + " ใน Routine_MasterPatternLab" };
+  }
+
+  // report อ่านวันที่ด้วย getUTC* จึงใช้เที่ยงคืน UTC ของวันนี้
+  const today = new Date();
+  const now = new Date(
+    Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())
+  );
+  // master ไม่มีวันที่เก็บตัวอย่างรายตัว ใช้วันนี้แทน
+  rows.forEach((row) => {
+    row.SamplingDate = now;
+  });
+
+  const custShort = custShortReq || safe(rows[0].CustShort);
+  const incharge = safe(rows[0].Incharge);
+  const signerRows = [
+    { name: "" },
+    { name: signerName(incharge) },
+    { name: signerName(master.DGM) },
+    { name: signerName(master.JP) },
+  ];
+  const positions = await loadOvsPositions(signerRows.map((s) => s.name));
+  const signers = signerRows.map((signer) => ({
+    name: signer.name,
+    position: positions[signer.name] || "",
+    signed: false,
+  }));
+
+  // ReqNo ปลอมสำหรับ preview เท่านั้น
+  const reqNo = "PREVIEW-" + custShort.replace(/[^A-Za-z0-9_-]/g, "_");
+
+  return {
+    reqNo: reqNo,
+    // ช่อง Ref. No. ในหัวรายงานแคบ ชื่อลูกค้ายาว ๆ จะล้นขอบกระดาษ
+    refNo: "PREVIEW",
+    custFull: custFull || safe(rows[0].CustFull),
+    custShort: custShort,
+    patternReport: master.PatternReport,
+    samplingDate: now,
+    receiveDate: now,
+    reportingDate: now,
+    signers: signers,
+    tanks: groupTanks(rows, RESULT_FIELD_PREVIEW, {}, {}),
+  };
+}
+
+router.post("/KACReportData_PreviewMasterReportOVS", async (req, res) => {
+  console.log("in _PreviewMasterReportOVS");
+  try {
+    const built = await buildOvsReportFromMaster(req.body.CustShort, req.body.CustFull);
+    if (built.error) throw new Error(built.error);
+    if (!createpdfOvs.HasPattern(built.patternReport)) {
+      throw new Error("ยังไม่มี pattern ของ OVS สำหรับ '" + built.patternReport + "'");
+    }
+    console.log(
+      `PreviewMasterReportOVS : ${built.reqNo} | pattern OVS = ${built.patternReport} | lines = ${built.tanks.length}`
+    );
+    const pdf = await createpdfOvs.SelectPattern(built);
+    return res.send(pdf);
+  } catch (error) {
+    const message = errText(error);
+    console.error("[PreviewMasterReportOVS] " + (req.body.CustShort || req.body.CustFull) + " : " + message);
+    return res.status(500).send("ERROR: " + message);
+  }
+});
 
 // -------------------------------------------------------------------------
 // ข้อมูลรูปแบบเดียวกับ Routine_KACReport สำหรับตกไปใช้แบบฟอร์มของ SAR เดิม
@@ -819,5 +950,6 @@ router.post("/KACReportData_createKACReportOVS", async (req, res) => {
 module.exports = router;
 module.exports.buildOvsReport = buildOvsReport;
 module.exports.buildOvsReportData = buildOvsReportData;
+module.exports.buildOvsReportFromMaster = buildOvsReportFromMaster;
 module.exports.createReportOvs = createReportOvs;
 module.exports.RESULT_FIELD_CREATE = RESULT_FIELD_CREATE;

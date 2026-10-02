@@ -14,7 +14,7 @@ const util = require("./PatternComponent_OVS/Ovs_Util.js");
 //   P-Ratio / Ni / Mn = ผลของ ItemName นั้นในตัวอย่างนั้น
 // ตัวอย่างที่ไม่ได้ขอ Ni / Mn มา ช่องผลจะเป็นสีเทา
 // remark กับช่องเซ็นอยู่หน้าสุดท้ายเสมอ
-// หัวกระดาษ / ช่องเซ็น / เลข form ใช้ชุดเดียวกับ AKZ
+// หัวกระดาษ / เลข form ใช้ชุดเดียวกับ AKZ ช่องเซ็นใช้กรอบเดิมแต่หัวกรอบแบบ Enkei
 // -------------------------------------------------------------------------
 
 const PAGE_TITLE = "PERFORMANCE OF PHOSPHATE COATING";
@@ -33,6 +33,9 @@ const REMARK_LINES = [
   "- Standard Curve of Ni on SPCC is in range of 8.76-19.65 mg/m²",
   "- Standard Curve of Mn on SPCC is in range of 88.70-111.00 mg/m²",
 ];
+
+// ช่องเซ็นใช้กรอบชุดเดิม เปลี่ยนแค่หัวกรอบตามแบบฟอร์มนี้
+const SIGN_LABELS = ["Issued by:", "Checked by:", "Review by:", "Approved by:"];
 
 const NO_ITEM_FILL = [217, 217, 217];
 
@@ -253,14 +256,14 @@ exports.CreatePDF = async (report) => {
   // remark และช่องเซ็นต้องอยู่หน้าสุดท้ายด้วยกันเสมอ
   // ถ้า remark จะทับช่องเซ็น ย้ายทั้งสองอย่างไปหน้าใหม่พร้อมหัวกระดาษ
   let remarkY = currentY - TABLE_GAP + REMARK_GAP;
-  const signatureTopY = signature.TopY(doc, report.signers);
+  const signatureTopY = signature.TopY(doc, report.signers, SIGN_LABELS);
   if (remarkY + remarkHeight() + 4 > signatureTopY) {
     doc.addPage();
     remarkY = drawPageHeader(doc, report);
   }
   const lastY = drawRemark(doc, remarkY);
 
-  signature.DrawSignature(doc, report.signers, lastY + 4);
+  signature.DrawSignature(doc, report.signers, lastY + 4, SIGN_LABELS);
   header.DrawFormCode(doc);
 
   return Buffer.from(doc.output("arraybuffer")).toString("base64");

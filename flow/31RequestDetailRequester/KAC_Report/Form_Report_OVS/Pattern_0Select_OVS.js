@@ -4,7 +4,13 @@ const Pattern_NPM = require("./Pattern_NPM.js");
 const Pattern_PPI_Toyota = require("./Pattern_PPI_Toyota.js");
 const Pattern_PPI_Mitsu = require("./Pattern_PPI_Mitsu.js");
 const Pattern_PPI_Metal = require("./Pattern_PPI_Metal.js");
+const Pattern_PPI_Enkei = require("./Pattern_PPI_Enkei.js");
 const Pattern_VPC_MitsubishiVN = require("./Pattern_VPC_MitsubishiVN.js");
+const Pattern_VPC_GPMI_SolventPaint = require("./Pattern_VPC_GPMI_SolventPaint.js");
+const Pattern_VPC_TayNamSteel = require("./Pattern_VPC_TayNamSteel.js");
+const Pattern_VPC_DongA = require("./Pattern_VPC_DongA.js");
+const Pattern_VPH_FujitonVN_GL = require("./Pattern_VPH_FujitonVN_GL.js");
+const Pattern_VPH_TMV_FrameLine = require("./Pattern_VPH_TMV_FrameLine.js");
 
 // -------------------------------------------------------------------------
 // ตัวเลือก pattern ของระบบ OVS
@@ -23,7 +29,13 @@ const PATTERNS = {
   "PPI - TOYOTA": Pattern_PPI_Toyota,
   "PPI - MITSU": Pattern_PPI_Mitsu,
   "PPI - METAL": Pattern_PPI_Metal,
+  "PPI - ENKEI": Pattern_PPI_Enkei,
   "VPC-MITSUBISHI VN": Pattern_VPC_MitsubishiVN,
+  "VPC-GPMI SOLVENT PAINT": Pattern_VPC_GPMI_SolventPaint,
+  "VPC-TAY NAM STEEL": Pattern_VPC_TayNamSteel,
+  "VPC-DONG A": Pattern_VPC_DongA,
+  "VPH-FUJITON VN-GL": Pattern_VPH_FujitonVN_GL,
+  "VPH-TMV-FRAME LINE": Pattern_VPH_TMV_FrameLine,
 };
 
 exports.HasPattern = (patternReport) => {

@@ -25,6 +25,9 @@ const fs = require("fs");
         if (dataIn.Branch == "RAYONG") {
           await sleep(500);
         }
+        if (dataIn.Branch == "OVS") {
+          await sleep(1000);
+        }
         var data = await ItemAnalysisDue.fetchItemAnalysisDueGrpah(dataIn);
         res.send(data);
       } catch (error) {

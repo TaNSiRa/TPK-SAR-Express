@@ -21,12 +21,12 @@ const SAMPLE_BAR_FILL = [157, 195, 230];
 //
 // บล็อกโลโก้ + ชื่อหน่วยงาน วางไว้กลางกระดาษ
 // แล้ว TEST REPORT กับบล็อกวันที่ไล่ลงมาข้างล่าง (ห้ามทับกัน)
-// ทุก pattern ของ OVS ใช้หัวเดียวกันหมด
+// ทุก pattern ของ OVS ใช้หัวเดียวกันหมด (A3 แนวนอนใช้ DrawHeaderWide)
 // -------------------------------------------------------------------------
-exports.DrawHeader = (doc, header) => {
-  const pageWidth = doc.internal.pageSize.width;
-  let currentY = 14;
 
+// บล็อกโลโก้ + ชื่อหน่วยงาน กลางกระดาษ คืนขอบล่างของบล็อก (เท่ากับค่าเดิมก่อนบวกระยะห่าง)
+function drawCompanyBlock(doc, currentY) {
+  const pageWidth = doc.internal.pageSize.width;
   const logoWidth = 26;
   const logoHeight = 13;
   const gap = 6;
@@ -69,9 +69,12 @@ exports.DrawHeader = (doc, header) => {
     textY = textY + 5.4;
   });
 
-  currentY = Math.max(currentY + logoHeight, textY - 5.4) + 11;
+  return Math.max(currentY + logoHeight, textY - 5.4);
+}
 
-  // TEST REPORT ตัวหนา มีเส้นใต้ (jsPDF ไม่มี underline ในตัว ต้องขีดเส้นเอง)
+// TEST REPORT ตัวหนา มีเส้นใต้ (jsPDF ไม่มี underline ในตัว ต้องขีดเส้นเอง)
+function drawTestReport(doc, currentY) {
+  const pageWidth = doc.internal.pageSize.width;
   const title = "TEST REPORT";
   doc.setFont("times", "bold");
   doc.setFontSize(14);
@@ -85,14 +88,17 @@ exports.DrawHeader = (doc, header) => {
     pageWidth / 2 + titleWidth / 2,
     currentY + 1.3
   );
+}
 
-  // บล็อกวันที่อยู่ใต้ TEST REPORT ชิดฝั่งขวา
-  currentY = currentY + 7;
+// บล็อก Received date / Reporting date / Ref. No.
+// ค่าอยู่ที่ valueX ส่วนหัวข้อเริ่มตรงกันทั้งสามบรรทัด
+// จุดเริ่มคำนวณถอยจากค่า โดยยึดหัวข้อที่ยาวสุด จะได้ชิดค่ามากที่สุดโดยไม่ทับ
+// รับ baseline ของบรรทัดแรก คืน baseline ของบรรทัดสุดท้าย
+const DATE_LINE_HEIGHT = 5.8;
+
+function drawDateBlock(doc, header, valueX, currentY) {
   doc.setFont("times", "normal");
   doc.setFontSize(11);
-  // ค่าอยู่ที่เดิม ส่วนหัวข้อเริ่มตรงกันทั้งสามบรรทัด
-  // จุดเริ่มคำนวณถอยจากค่า โดยยึดหัวข้อที่ยาวสุด จะได้ชิดค่ามากที่สุดโดยไม่ทับ
-  const valueX = 157;
   const rows = [
     ["Received date:", util.toLongDate(header.receiveDate)],
     ["Reporting date:", util.toLongDate(header.reportingDate)],
@@ -104,15 +110,40 @@ exports.DrawHeader = (doc, header) => {
   });
   const labelX = valueX - labelWidth - 3;
 
-  const dateLineHeight = 5.8;
   rows.forEach((row, index) => {
-    const y = currentY + index * dateLineHeight;
+    const y = currentY + index * DATE_LINE_HEIGHT;
     doc.text(row[0], labelX, y);
     doc.text(row[1], valueX, y);
   });
-  currentY = currentY + (rows.length - 1) * dateLineHeight;
+  return currentY + (rows.length - 1) * DATE_LINE_HEIGHT;
+}
+
+exports.DrawHeader = (doc, header) => {
+  let currentY = drawCompanyBlock(doc, 14) + 11;
+
+  drawTestReport(doc, currentY);
+
+  // บล็อกวันที่อยู่ใต้ TEST REPORT ชิดฝั่งขวา
+  currentY = drawDateBlock(doc, header, 157, currentY + 7);
 
   return currentY + 8;
+};
+
+// หัวกระดาษของ pattern ที่ใช้กระดาษ A3 แนวนอน
+// บล็อกโลโก้ + ชื่อหน่วยงานกลางกระดาษเหมือนเดิม
+// แต่บล็อกวันที่ย้ายขึ้นไปอยู่ขวามือใต้ชื่อหน่วยงาน แล้ว TEST REPORT ต่อลงมาข้างล่าง
+// คืน baseline ของ TEST REPORT ให้ผู้เรียกวางหัวข้อหน้าต่อ
+exports.DrawHeaderWide = (doc, header) => {
+  const pageWidth = doc.internal.pageSize.width;
+  const companyBottom = drawCompanyBlock(doc, 14);
+
+  // ระยะจากขอบขวาเท่ากับหัว A4 (ค่าเริ่มที่ 157 จากกระดาษกว้าง 210)
+  const valueX = pageWidth - 53;
+  const lastDateY = drawDateBlock(doc, header, valueX, companyBottom + 4);
+
+  const testReportY = lastDateY + 4;
+  drawTestReport(doc, testReportY);
+  return testReportY;
 };
 
 // หัวข้อของหน้า เช่น QUALITY OF SOLUTION / PERFORMANCE OF PHOSPHATE COATING
