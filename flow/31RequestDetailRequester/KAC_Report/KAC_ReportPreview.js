@@ -5,6 +5,8 @@ const createpdf = require("./Form_Report/Pattern_0Select.js");
 const createReport = require("../function/createReport.js");
 const masterDoc = require("./Form_Report/PatternComponent/Pattern_5MasterDoc.js");
 const masterDocYearly = require("./Form_Report/PatternComponent/Pattern_1MainHeadSetYear.js");
+const createpdfOvs = require("./Form_Report_OVS/Pattern_0Select_OVS.js");
+const ovsReport = require("./KAC_ReportOVS.js");
 
 // -------------------------------------------------------------------------
 // PREVIEW REPORT จาก MASTER PATTERN (ไม่มีค่า Result จริง)
@@ -259,9 +261,35 @@ async function countHistoryThisYear(custFull) {
   }
 }
 
+// ปุ่ม preview ของ MASTER-SAR ใช้ร่วมกันทั้ง SAR เดิมและ OVS
+// ดู PatternReport ของลูกค้าก่อน (อ่านแบบเดียวกับตอนออก report จริงของ OVS)
+//   - เป็น pattern ของ Form_Report_OVS -> preview ด้วยแบบฟอร์มของ OVS
+//   - ไม่ใช่                           -> preview ด้วยแบบฟอร์มของ SAR เดิม
+// ถ้าไม่แยก ลูกค้า OVS จะตกไป else ปิดท้ายของ Pattern_0Select ซึ่งเป็น K1 เสมอ
+async function previewOvs(custShort, custFull) {
+  const master = await ovsReport.loadHeaderFromMaster(custShort, custFull);
+  if (!createpdfOvs.HasPattern(master.PatternReport)) return null;
+
+  const built = await ovsReport.buildOvsReportFromMaster(custShort, custFull);
+  if (built.error) return "ERROR: " + built.error;
+  console.log(
+    `PreviewMasterReport : ${built.reqNo} | pattern OVS = ${built.patternReport} | lines = ${built.tanks.length}`
+  );
+  try {
+    return await createpdfOvs.SelectPattern(built);
+  } catch (err) {
+    console.log("PreviewMasterReport : create pdf OVS failed");
+    console.log(err);
+    return `ERROR: สร้าง PDF pattern OVS '${built.patternReport}' ไม่สำเร็จ\n${errText(err)}`;
+  }
+}
+
 router.post("/KACReportData_PreviewMasterReport", async (req, res) => {
   console.log("in _PreviewMasterReport");
   try {
+    const ovs = await previewOvs(req.body.CustShort, req.body.CustFull);
+    if (ovs !== null) return res.send(ovs);
+
     const built = await buildPreviewData(req.body.CustShort, req.body.CustFull);
     if (built.noData) return res.send("NODATA");
     if (built.error) {

@@ -951,5 +951,6 @@ module.exports = router;
 module.exports.buildOvsReport = buildOvsReport;
 module.exports.buildOvsReportData = buildOvsReportData;
 module.exports.buildOvsReportFromMaster = buildOvsReportFromMaster;
+module.exports.loadHeaderFromMaster = loadHeaderFromMaster;
 module.exports.createReportOvs = createReportOvs;
 module.exports.RESULT_FIELD_CREATE = RESULT_FIELD_CREATE;
